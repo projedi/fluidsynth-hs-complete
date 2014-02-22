@@ -14,9 +14,13 @@ maintainer:          shabalyn.a@gmail.com
 library
   build-depends:     base >= 4.6 && < 5
                    , bindings-DSL >= 1.0.20 && < 1.1
+                   , containers >= 0.5.3.1 && < 0.6
+                   , lens >= 4.0.4 && < 4.1
                    , mtl >= 2.1.2 && < 2.2
   default-language:  Haskell2010
   exposed-modules:   Sound.Fluidsynth
+                   , Sound.Fluidsynth.Audio
+                   , Sound.Fluidsynth.Settings
   extra-libraries:   fluidsynth
   ghc-options:       -Wall -fno-warn-unused-imports
   hs-source-dirs:    src/
@@ -38,3 +42,4 @@ library
                    , Sound.Fluidsynth.Internal.FFI.Types
                    , Sound.Fluidsynth.Internal.FFI.Version
                    , Sound.Fluidsynth.Internal.FFI.Voice
+                   , Sound.Fluidsynth.Internal.Types
