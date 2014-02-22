@@ -21,6 +21,7 @@ library
   exposed-modules:   Sound.Fluidsynth
                    , Sound.Fluidsynth.Audio
                    , Sound.Fluidsynth.Settings
+                   , Sound.Fluidsynth.Types
   extra-libraries:   fluidsynth
   ghc-options:       -Wall -fno-warn-unused-imports
   hs-source-dirs:    src/
