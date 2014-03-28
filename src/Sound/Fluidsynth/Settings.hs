@@ -5,7 +5,7 @@
 -- Settings are typed maps from \"string.like.this\" to \"value\". Where
 -- value is either a 'SettingString', 'SettingInt' or 'SettingDouble'. All settings have
 -- a current value, a default value and can be set at runtime. Integer
--- and double also have an acceptable range of value and string might have
+-- and double also have an acceptable range of values and string might have
 -- an acceptable list of options.
 --
 -- Even though one can change any setting at runtime only some will actually
@@ -87,7 +87,7 @@ runSettings (Settings m) = do
    c'delete_fluid_settings ptr
    return res
 
--- | It is called "realtime" in fluidsynth.
+-- | It is called \"realtime\" in fluidsynth.
 isMutable :: (MonadSettings m) => String -> m Bool
 isMutable name = do
    setptr <- settingsPtr
@@ -215,6 +215,7 @@ getString name = do
     Just cstr -> Just <$> liftIO (peekCString cstr)
     Nothing -> return Nothing
 
+-- | Get allowed values for this string option. Nothing if any value is accepted.
 getOptionsString :: (MonadSettings m) => String -> m (Maybe [String])
 getOptionsString name = do
    setptr <- settingsPtr
