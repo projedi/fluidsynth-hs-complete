@@ -1,14 +1,15 @@
 {-# LANGUAGE FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses,
              TemplateHaskell #-}
 module Sound.Fluidsynth.Internal.Types
-   ( FluidState
+   ( AudioDriver(..)
+   , FluidState
    , FluidSynth(..)
    , MonadSettings(..)
    , Settings
    , withSettingsRunFluid
    -- Lenses from FluidState
    , synthPtr
-   , audioDriverPtr
+   , audioDriver
    ) where
 
 import Control.Applicative
@@ -32,10 +33,6 @@ import Foreign
    )
 
 import Sound.Fluidsynth.Internal.FFI.Types
-   ( C'fluid_audio_driver_t
-   , C'fluid_settings_t
-   , C'fluid_synth_t
-   )
 import Sound.Fluidsynth.Internal.FFI.Settings
    ( c'new_fluid_settings
    , c'delete_fluid_settings
@@ -67,10 +64,13 @@ instance MonadSettings (ReaderT (Ptr C'fluid_settings_t) IO) where
 newtype Settings a = Settings (ReaderT (Ptr C'fluid_settings_t) IO a)
    deriving (Functor, Applicative, Monad, MonadIO, MonadSettings)
 
+data AudioDriver = AudioDriver (Ptr C'fluid_audio_driver_t)
+                 | FileRenderer (Ptr C'fluid_file_renderer_t)
+
 data FluidState = FluidState
    { fsSettingsPtr :: Ptr C'fluid_settings_t -- we have settingsPtr in MonadSettings
    , _synthPtr :: Ptr C'fluid_synth_t
-   , _audioDriverPtr :: Maybe (Ptr C'fluid_audio_driver_t)
+   , _audioDriver :: Maybe AudioDriver
    }
 
 makeLenses ''FluidState
@@ -106,7 +106,7 @@ withSettingsRunFluid (Settings set) (FluidSynth (ReaderFluidState syn)) = do
          let flstate = FluidState
               { fsSettingsPtr = setptr
               , _synthPtr = synptr
-              , _audioDriverPtr = Nothing
+              , _audioDriver = Nothing
               }
          ref <- newIORef flstate
          bracket (newStablePtr ref) freeStablePtr $ \ptr ->

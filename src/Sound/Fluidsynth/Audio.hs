@@ -10,12 +10,14 @@
 -- * There is a \"file\" audio driver which is implemented in terms of lower level
 --   file renderer.
 --
--- TODO: What about low level file renderer
+-- * File renderer also cannot be used simultaneously with another audio driver:
+--   its core function, process_block rolls synth forward.
 module Sound.Fluidsynth.Audio
-   ( -- * Audio drivers
-     replaceAudioDriver
+   ( replaceAudioDriver
    , AudioCallback
    , replaceAudioDriverWithCallback
+   , replaceFileRenderer
+   , fileRendererProcessBlock
    , deleteAudioDriver
    ) where
 
@@ -29,20 +31,22 @@ import Foreign.Marshal.Array(peekArray, pokeArray)
 import Foreign.Ptr(nullPtr)
 
 import Sound.Fluidsynth.Internal.FFI.Audio
+import Sound.Fluidsynth.Internal.FFI.Misc
 import Sound.Fluidsynth.Internal.FFI.Types
 import Sound.Fluidsynth.Internal.Types
 
 -- TODO: What about error handling.
 
 -- | Will read current "Sound.Fluidsynth.Settings", create an according audio driver
--- and replace an existing one(if any). Returns False on error.
+--   and replace an existing audio driver(if any) or file renderer.
+--   Returns False on error.
 replaceAudioDriver :: FluidSynth Bool
 replaceAudioDriver = FluidSynth $ do
    sePtr <- settingsPtr
    syPtr <- use synthPtr
    aptr <- liftIO $ c'new_fluid_audio_driver sePtr syPtr
    when (aptr /= nullPtr) $
-      audioDriverPtr .= Just aptr
+      audioDriver .= Just (AudioDriver aptr)
    return $ aptr /= nullPtr
 
 type AudioCallback
@@ -59,7 +63,7 @@ replaceAudioDriverWithCallback f = FluidSynth $ do
    dataPtr <- fluidDataPtr
    aptr <- liftIO $ c'new_fluid_audio_driver2 sePtr cbPtr dataPtr
    when (aptr /= nullPtr) $
-      audioDriverPtr .= Just aptr
+      audioDriver .= Just (AudioDriver aptr)
    return $ aptr /= nullPtr
  where callback ptr len nin cin nout cout = do
           -- TODO: Error handling: wrong lengths and such
@@ -73,12 +77,39 @@ replaceAudioDriverWithCallback f = FluidSynth $ do
              zip outchans (map (take (fromIntegral len)) outbuf)
           return 0
 
--- | Will remove an audio driver. Returns False when no driver were attached
+-- | Will read current "Sound.Fluidsynth.Settings", create an according file renderer
+--   and replace an existing file renderer(if any) or audio driver.
+--   Returns False on error.
+replaceFileRenderer :: FluidSynth Bool
+replaceFileRenderer = FluidSynth $ do
+   syPtr <- use synthPtr
+   fptr <- liftIO $ c'new_fluid_file_renderer syPtr
+   when (fptr /= nullPtr) $
+      audioDriver .= Just (FileRenderer fptr)
+   return $ fptr /= nullPtr
+
+-- TODO: Maybe throw an exception when no renderer is attached.
+-- | Will get audio frames from synthesizer and write them to the file.
+--   Returns False on error(failure to write or when no file renderer is attached).
+fileRendererProcessBlock :: FluidSynth Bool
+fileRendererProcessBlock = FluidSynth $ do
+   aptr <- use audioDriver
+   case aptr of
+    Just (FileRenderer fptr) -> do
+       res <- liftIO $ c'fluid_file_renderer_process_block fptr
+       return $ res == c'FLUID_OK
+    _ -> return False
+
+-- | Will remove an audio driver or file renderer.
+--   Returns False when nothing was attached.
 deleteAudioDriver :: FluidSynth Bool
 deleteAudioDriver = FluidSynth $ do
-   aptrPrev <- audioDriverPtr <<.= Nothing
+   aptrPrev <- audioDriver <<.= Nothing
    case aptrPrev of
     Nothing -> return False
-    Just aptr -> do
+    Just (AudioDriver aptr) -> do
       liftIO $ c'delete_fluid_audio_driver aptr
+      return True
+    Just (FileRenderer fptr) -> do
+      liftIO $ c'delete_fluid_file_renderer fptr
       return True
