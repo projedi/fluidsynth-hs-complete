@@ -47,13 +47,10 @@ import Sound.Fluidsynth.Internal.FFI.Synth
    )
 import Sound.Fluidsynth.Internal.FFI.Types
 
--- MonadSettings exists because Settings and FluidSynth both
--- should be able to use Sound.Fluidsynth.Settings interface.
--- Settings is distinguished from FluidSynth because some
--- properties must be set before creating C'fluid_synth_t.
-
--- fluidDataPtr and runFluidMonad are used in C callbacks.
+-- | MonadSettings exists because 'Settings' and 'FluidSynth' both
+--   should be able to use "Sound.Fluidsynth.Settings" interface.
 class (Applicative m, MonadIO m) => MonadSettings m where
+   -- fluidDataPtr and runFluidMonad are used in C callbacks.
    -- Contains data needed to reconstruct a monad in runFluidMonad.
    -- Must be alive for the entire life of the monad.
    fluidDataPtr :: m (Ptr ())
@@ -66,6 +63,8 @@ instance MonadSettings (ReaderT (Ptr C'fluid_settings_t) IO) where
    runFluidMonad m ptr = runReaderT m (castPtr ptr)
    settingsPtr = ask
 
+-- | 'Settings' is distinguished from 'FluidSynth' because some
+--   properties must be set before creating synthesizer.
 newtype Settings a = Settings (ReaderT (Ptr C'fluid_settings_t) IO a)
    deriving (Functor, Applicative, Monad, MonadIO, MonadSettings)
 
@@ -121,9 +120,12 @@ instance MonadSettings ReaderFluidState where
       runReaderT m (ptr, ref)
    settingsPtr = fsSettingsPtr <$> get
 
+-- | The main monad in which everything happens.
 newtype FluidSynth a = FluidSynth (ReaderFluidState a)
    deriving (Functor, Applicative, Monad, MonadIO, MonadSettings)
 
+-- | Run the 'Settings' monad and then allocate a synthesizer and
+--   run 'FluidSynth' monad. Releases all the resources at the end.
 withSettingsRunFluid :: Settings () -> FluidSynth a -> IO a
 withSettingsRunFluid (Settings set) (FluidSynth (ReaderFluidState syn)) =
    bracket c'new_fluid_settings c'delete_fluid_settings $ \setptr -> do

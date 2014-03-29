@@ -17,10 +17,10 @@
 -- There is also a notion of hints but it is not implemented yet.
 -- TODO: Add support for hints.
 --
--- getX, getRangeX, getDefaultX will return Nothing if no setting of this type
+-- getX, getRangeX, getDefaultX will return 'Nothing' if no setting of this type
 -- was found.
 --
--- setX will return False if 
+-- setX will return 'False' if
 --
 -- * Setting was found but was of wrong type
 --
@@ -194,7 +194,7 @@ getString name = do
     Just cstr -> Just <$> liftIO (peekCString cstr)
     Nothing -> return Nothing
 
--- | Get allowed values for this string option. Nothing if any value is accepted.
+-- | Get allowed values for this string option. 'Nothing' if any value is accepted.
 getOptionsString :: (MonadSettings m) => String -> m (Maybe [String])
 getOptionsString name = do
    setptr <- settingsPtr

@@ -39,7 +39,7 @@ import Sound.Fluidsynth.Internal.Types
 
 -- | Will read current "Sound.Fluidsynth.Settings", create an according audio driver
 --   and replace an existing audio driver(if any) or file renderer.
---   Returns False on error.
+--   Returns 'False' on error.
 replaceAudioDriver :: FluidSynth Bool
 replaceAudioDriver = FluidSynth $ do
    sePtr <- settingsPtr
@@ -79,7 +79,7 @@ replaceAudioDriverWithCallback f = FluidSynth $ do
 
 -- | Will read current "Sound.Fluidsynth.Settings", create an according file renderer
 --   and replace an existing file renderer(if any) or audio driver.
---   Returns False on error.
+--   Returns 'False' on error.
 replaceFileRenderer :: FluidSynth Bool
 replaceFileRenderer = FluidSynth $ do
    syPtr <- use synthPtr
@@ -90,7 +90,7 @@ replaceFileRenderer = FluidSynth $ do
 
 -- TODO: Maybe throw an exception when no renderer is attached.
 -- | Will get audio frames from synthesizer and write them to the file.
---   Returns False on error(failure to write or when no file renderer is attached).
+--   Returns 'False' on error(failure to write or when no file renderer is attached).
 fileRendererProcessBlock :: FluidSynth Bool
 fileRendererProcessBlock = FluidSynth $ do
    aptr <- use audioDriver
