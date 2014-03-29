@@ -5,6 +5,7 @@ module Sound.Fluidsynth.Internal.Types
    , FluidState
    , FluidSynth(..)
    , MonadSettings(..)
+   , ReleaseResources(..)
    , Settings
    , withSettingsRunFluid
    -- Lenses from FluidState
@@ -32,7 +33,10 @@ import Foreign
    , castPtrToStablePtr
    )
 
-import Sound.Fluidsynth.Internal.FFI.Types
+import Sound.Fluidsynth.Internal.FFI.Audio
+   ( c'delete_fluid_audio_driver
+   , c'delete_fluid_file_renderer
+   )
 import Sound.Fluidsynth.Internal.FFI.Settings
    ( c'new_fluid_settings
    , c'delete_fluid_settings
@@ -41,6 +45,7 @@ import Sound.Fluidsynth.Internal.FFI.Synth
    ( c'new_fluid_synth
    , c'delete_fluid_synth
    )
+import Sound.Fluidsynth.Internal.FFI.Types
 
 -- MonadSettings exists because Settings and FluidSynth both
 -- should be able to use Sound.Fluidsynth.Settings interface.
@@ -64,14 +69,35 @@ instance MonadSettings (ReaderT (Ptr C'fluid_settings_t) IO) where
 newtype Settings a = Settings (ReaderT (Ptr C'fluid_settings_t) IO a)
    deriving (Functor, Applicative, Monad, MonadIO, MonadSettings)
 
+class ReleaseResources a where
+   releaseResources :: a -> IO ()
+
+instance ReleaseResources a => ReleaseResources (Maybe a) where
+   releaseResources Nothing = return ()
+   releaseResources (Just x) = releaseResources x
+
+instance ReleaseResources a => ReleaseResources [a] where
+   releaseResources = mapM_ releaseResources
+
 data AudioDriver = AudioDriver (Ptr C'fluid_audio_driver_t)
                  | FileRenderer (Ptr C'fluid_file_renderer_t)
+
+instance ReleaseResources AudioDriver where
+   releaseResources (AudioDriver aptr) =
+      c'delete_fluid_audio_driver aptr
+   releaseResources (FileRenderer fptr) =
+      c'delete_fluid_file_renderer fptr
 
 data FluidState = FluidState
    { fsSettingsPtr :: Ptr C'fluid_settings_t -- we have settingsPtr in MonadSettings
    , _synthPtr :: Ptr C'fluid_synth_t
    , _audioDriver :: Maybe AudioDriver
    }
+
+instance ReleaseResources FluidState where
+   -- The first two are handled separately in the withSettingsRunFluid
+   releaseResources (FluidState _ _ a1) =
+      releaseResources [a1]
 
 makeLenses ''FluidState
 
@@ -109,7 +135,8 @@ withSettingsRunFluid (Settings set) (FluidSynth (ReaderFluidState syn)) =
               , _audioDriver = Nothing
               }
          ref <- newIORef flstate
-         bracket (newStablePtr ref) freeStablePtr $ \ptr ->
+         res <- bracket (newStablePtr ref) freeStablePtr $ \ptr ->
             runReaderT syn (castStablePtrToPtr ptr, ref)
-         -- TODO: This is the point when we need to look at FluidState and deallocate
-         -- TODO: all the pointers(e.g. audio driver)
+         curstate <- readIORef ref
+         releaseResources curstate
+         return res

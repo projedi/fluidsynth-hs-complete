@@ -100,16 +100,8 @@ fileRendererProcessBlock = FluidSynth $ do
        return $ res == c'FLUID_OK
     _ -> return False
 
--- | Will remove an audio driver or file renderer.
---   Returns False when nothing was attached.
-deleteAudioDriver :: FluidSynth Bool
+-- | Will remove an audio driver or file renderer(if any).
+deleteAudioDriver :: FluidSynth ()
 deleteAudioDriver = FluidSynth $ do
    aptrPrev <- audioDriver <<.= Nothing
-   case aptrPrev of
-    Nothing -> return False
-    Just (AudioDriver aptr) -> do
-      liftIO $ c'delete_fluid_audio_driver aptr
-      return True
-    Just (FileRenderer fptr) -> do
-      liftIO $ c'delete_fluid_file_renderer fptr
-      return True
+   liftIO $ releaseResources aptrPrev
