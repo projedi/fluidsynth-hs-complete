@@ -1,6 +1,8 @@
-module Sound.Fluidsynth.Types( MonadFluid
-                             , MonadSettings
-                             , MonadSynth
-                             ) where
+module Sound.Fluidsynth.Types
+   ( MonadSettings
+   , Settings
+   , FluidSynth
+   , withSettingsRunFluid
+   ) where
 
 import Sound.Fluidsynth.Internal.Types

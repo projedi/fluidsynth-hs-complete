@@ -1,4 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving #-}
 -- |
 -- Audio drivers and file renderers.
 --
@@ -12,14 +11,16 @@
 --   file renderer.
 --
 -- TODO: What about low level file renderer
-module Sound.Fluidsynth.Audio( -- * Audio drivers
-                               replaceAudioDriver
-                             , AudioCallback
-                             , replaceAudioDriverWithCallback
-                             , deleteAudioDriver
-                             ) where
+module Sound.Fluidsynth.Audio
+   ( -- * Audio drivers
+     replaceAudioDriver
+   , AudioCallback
+   , replaceAudioDriverWithCallback
+   , deleteAudioDriver
+   ) where
 
 import Control.Applicative
+import Control.Lens
 import Control.Monad
 
 import Control.Monad.Trans(liftIO)
@@ -35,23 +36,24 @@ import Sound.Fluidsynth.Internal.Types
 
 -- | Will read current "Sound.Fluidsynth.Settings", create an according audio driver
 -- and replace an existing one(if any). Returns False on error.
-replaceAudioDriver :: (MonadSynth m) => m Bool
-replaceAudioDriver = do
+replaceAudioDriver :: FluidSynth Bool
+replaceAudioDriver = FluidSynth $ do
    sePtr <- settingsPtr
-   syPtr <- synthPtr
+   syPtr <- use synthPtr
    aptr <- liftIO $ c'new_fluid_audio_driver sePtr syPtr
    when (aptr /= nullPtr) $
       audioDriverPtr .= Just aptr
    return $ aptr /= nullPtr
 
-type AudioCallback m = Int -- ^ Length of audio in frames
-                     -> [[Float]] -- ^ Input (unused as of fluidsynth 1.1.6)
-                     -> Int -- ^ Output channel count
-                     -> m [[Float]] -- ^ Output buffers(outer is a list of channels)
+type AudioCallback
+   = Int -- ^ Length of audio in frames
+   -> [[Float]] -- ^ Input (unused as of fluidsynth 1.1.6)
+   -> Int -- ^ Output channel count
+   -> FluidSynth [[Float]] -- ^ Output buffers(outer list is of channels)
 
 -- | Like 'replaceAudioDriver' but supply your own callback to generate sound samples.
-replaceAudioDriverWithCallback :: (MonadSynth m) => AudioCallback m -> m Bool
-replaceAudioDriverWithCallback f = do
+replaceAudioDriverWithCallback :: AudioCallback -> FluidSynth Bool
+replaceAudioDriverWithCallback f = FluidSynth $ do
    sePtr <- settingsPtr
    cbPtr <- liftIO $ mk'fluid_audio_func_t callback
    dataPtr <- fluidDataPtr
@@ -60,11 +62,11 @@ replaceAudioDriverWithCallback f = do
       audioDriverPtr .= Just aptr
    return $ aptr /= nullPtr
  where callback ptr len nin cin nout cout = do
-          -- TODO: Error handling
+          -- TODO: Error handling: wrong lengths and such
           inchans <- peekArray (fromIntegral nin) cin
           inbuf <- mapM (peekArray (fromIntegral len)) inchans
           let inbuf' = map (map realToFrac) inbuf
-          outbuf' <- runFluidMonad ptr $ f (fromIntegral len) inbuf' (fromIntegral nout)
+          outbuf' <- runFluidMonad (f (fromIntegral len) inbuf' (fromIntegral nout)) ptr
           let outbuf = map (map realToFrac) outbuf'
           outchans <- peekArray (fromIntegral nout) cout
           mapM_ (uncurry pokeArray) $
@@ -72,8 +74,8 @@ replaceAudioDriverWithCallback f = do
           return 0
 
 -- | Will remove an audio driver. Returns False when no driver were attached
-deleteAudioDriver :: (MonadSynth m) => m Bool
-deleteAudioDriver = do
+deleteAudioDriver :: FluidSynth Bool
+deleteAudioDriver = FluidSynth $ do
    aptrPrev <- audioDriverPtr <<.= Nothing
    case aptrPrev of
     Nothing -> return False

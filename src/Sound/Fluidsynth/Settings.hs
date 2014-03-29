@@ -28,35 +28,33 @@
 -- * Setting was not found and could not have been created(e.g. creating
 --   \"string.like.this\" would fail if there exist a setting \"string.like\"
 --   which is not of type 'SettingSet')
-module Sound.Fluidsynth.Settings( Settings
-                                , runSettings
-                                , SettingType(..)
-                                , isMutable
-                                , getType
-                                , forSetting
-                                -- * Dealing with integer settings
-                                , getInt
-                                , getRangeInt
-                                , getDefaultInt
-                                , setInt
-                                -- * Dealing with floating point settings
-                                , getDouble
-                                , getRangeDouble
-                                , getDefaultDouble
-                                , setDouble
-                                -- * Dealing with string settings
-                                , getString
-                                , getOptionsString
-                                , getDefaultString
-                                , setString
-                                ) where
+module Sound.Fluidsynth.Settings
+   ( SettingType(..)
+   , isMutable
+   , getType
+   , forSetting
+   -- * Dealing with integer settings
+   , getInt
+   , getRangeInt
+   , getDefaultInt
+   , setInt
+   -- * Dealing with floating point settings
+   , getDouble
+   , getRangeDouble
+   , getDefaultDouble
+   , setDouble
+   -- * Dealing with string settings
+   , getString
+   , getOptionsString
+   , getDefaultString
+   , setString
+   ) where
 
 import Control.Applicative
 import Control.Monad
 
 import Control.Arrow((***))
 import Control.Exception(assert)
-import Control.Monad.Reader(ReaderT, ask, runReaderT)
 import Control.Monad.Trans(MonadIO, liftIO)
 import Data.IORef(modifyIORef, newIORef, readIORef)
 import Foreign.C.String(CString, newCString, peekCString, withCString)
@@ -67,25 +65,7 @@ import Foreign.Storable(Storable, peek)
 
 import Sound.Fluidsynth.Internal.FFI.Settings
 import Sound.Fluidsynth.Internal.FFI.Types
-import Sound.Fluidsynth.Internal.Types( MonadFluid, MonadSettings, fluidDataPtr
-                                      , runFluidMonad, settingsPtr)
-
-newtype Settings a = Settings (ReaderT (Ptr C'fluid_settings_t) IO a)
-   deriving (Functor, Applicative, Monad, MonadIO)
-
-instance MonadFluid Settings where
-   runFluidMonad ptr (Settings m) = runReaderT m (castPtr ptr)
-   fluidDataPtr = Settings (castPtr <$> ask)
-
-instance MonadSettings Settings where
-   settingsPtr = Settings ask
-
-runSettings :: Settings a -> IO a
-runSettings (Settings m) = do
-   ptr <- c'new_fluid_settings
-   res <- runReaderT m (castPtr ptr)
-   c'delete_fluid_settings ptr
-   return res
+import Sound.Fluidsynth.Internal.Types
 
 -- | It is called \"realtime\" in fluidsynth.
 isMutable :: (MonadSettings m) => String -> m Bool
@@ -121,7 +101,7 @@ forSetting f = do
       c'fluid_settings_foreach setptr ptr ccback
  where callback ptr cname sctype = do
           name <- peekCString cname
-          runFluidMonad ptr $ f name (stype sctype)
+          runFluidMonad (f name (stype sctype)) ptr
        stype sctype
         | sctype == c'FLUID_NUM_TYPE = SettingDouble
         | sctype == c'FLUID_INT_TYPE = SettingInt
