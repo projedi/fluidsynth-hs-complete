@@ -9,6 +9,7 @@ module Sound.Fluidsynth.Event
 	, Value
 	, Control
 	, ClientID
+	, Pitch
 	, SeqEventType(..)
 	, SeqEvent(..)
 	, seqEventType
