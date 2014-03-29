@@ -99,7 +99,7 @@ newtype FluidSynth a = FluidSynth (ReaderFluidState a)
    deriving (Functor, Applicative, Monad, MonadIO, MonadSettings)
 
 withSettingsRunFluid :: Settings () -> FluidSynth a -> IO a
-withSettingsRunFluid (Settings set) (FluidSynth (ReaderFluidState syn)) = do
+withSettingsRunFluid (Settings set) (FluidSynth (ReaderFluidState syn)) =
    bracket c'new_fluid_settings c'delete_fluid_settings $ \setptr -> do
       runReaderT set setptr
       bracket (c'new_fluid_synth setptr) c'delete_fluid_synth $ \synptr -> do

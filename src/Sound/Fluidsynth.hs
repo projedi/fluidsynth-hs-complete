@@ -1,10 +1,7 @@
 -- | TODO: Put some kind of a tutorial here
-module Sound.Fluidsynth
-   ( module Sound.Fluidsynth.Audio
-   , module Sound.Fluidsynth.Settings
-   , module Sound.Fluidsynth.Types
-   ) where
+module Sound.Fluidsynth(module X) where
 
-import Sound.Fluidsynth.Audio
-import Sound.Fluidsynth.Settings
-import Sound.Fluidsynth.Types
+-- Trick that hlint showed me
+import Sound.Fluidsynth.Audio as X
+import Sound.Fluidsynth.Settings as X
+import Sound.Fluidsynth.Types as X

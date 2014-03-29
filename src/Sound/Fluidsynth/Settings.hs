@@ -1,4 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- |
 -- Settings for fluidsynth.
 --
@@ -84,7 +83,7 @@ getType name = do
    setptr <- settingsPtr
    res <- liftIO $ withCString name $ c'fluid_settings_get_type setptr
    case () of
-    _ | res == c'FLUID_NO_TYPE -> return $ Nothing
+    _ | res == c'FLUID_NO_TYPE -> return Nothing
       | res == c'FLUID_NUM_TYPE -> return $ Just SettingDouble
       | res == c'FLUID_INT_TYPE -> return $ Just SettingInt
       | res == c'FLUID_STR_TYPE -> return $ Just SettingString
