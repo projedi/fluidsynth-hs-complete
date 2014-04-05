@@ -43,7 +43,7 @@ import Sound.Fluidsynth.Internal.Types
 replaceAudioDriver :: FluidSynth Bool
 replaceAudioDriver = FluidSynth $ do
    sePtr <- settingsPtr
-   syPtr <- use synthPtr
+   (Synth syPtr) <- use synth
    aptr <- liftIO $ c'new_fluid_audio_driver sePtr syPtr
    when (aptr /= nullPtr) $
       audioDriver .= Just (AudioDriver aptr)
@@ -82,7 +82,7 @@ replaceAudioDriverWithCallback f = FluidSynth $ do
 --   Returns 'False' on error.
 replaceFileRenderer :: FluidSynth Bool
 replaceFileRenderer = FluidSynth $ do
-   syPtr <- use synthPtr
+   (Synth syPtr) <- use synth
    fptr <- liftIO $ c'new_fluid_file_renderer syPtr
    when (fptr /= nullPtr) $
       audioDriver .= Just (FileRenderer fptr)

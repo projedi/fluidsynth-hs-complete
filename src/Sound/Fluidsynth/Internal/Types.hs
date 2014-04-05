@@ -7,10 +7,11 @@ module Sound.Fluidsynth.Internal.Types
    , MonadSettings(..)
    , ReleaseResources(..)
    , Settings
+   , Synth(..)
    , withSettingsRunFluid
    -- Lenses from FluidState
-   , synthPtr
    , audioDriver
+   , synth
    ) where
 
 import Control.Applicative
@@ -78,6 +79,11 @@ instance ReleaseResources a => ReleaseResources (Maybe a) where
 instance ReleaseResources a => ReleaseResources [a] where
    releaseResources = mapM_ releaseResources
 
+newtype Synth = Synth (Ptr C'fluid_synth_t)
+
+instance ReleaseResources Synth where
+   releaseResources (Synth ptr) = c'delete_fluid_synth ptr
+
 data AudioDriver = AudioDriver (Ptr C'fluid_audio_driver_t)
                  | FileRenderer (Ptr C'fluid_file_renderer_t)
 
@@ -89,14 +95,15 @@ instance ReleaseResources AudioDriver where
 
 data FluidState = FluidState
    { fsSettingsPtr :: Ptr C'fluid_settings_t -- we have settingsPtr in MonadSettings
-   , _synthPtr :: Ptr C'fluid_synth_t
+   , _synth :: Synth
    , _audioDriver :: Maybe AudioDriver
    }
 
 instance ReleaseResources FluidState where
-   -- The first two are handled separately in the withSettingsRunFluid
-   releaseResources (FluidState _ _ a1) =
-      releaseResources [a1]
+   -- The first one is handled separately in the withSettingsRunFluid
+   releaseResources (FluidState _ a1 a2) = do
+      releaseResources a1
+      releaseResources a2
 
 makeLenses ''FluidState
 
@@ -130,15 +137,19 @@ withSettingsRunFluid :: Settings () -> FluidSynth a -> IO a
 withSettingsRunFluid (Settings set) (FluidSynth (ReaderFluidState syn)) =
    bracket c'new_fluid_settings c'delete_fluid_settings $ \setptr -> do
       runReaderT set setptr
-      bracket (c'new_fluid_synth setptr) c'delete_fluid_synth $ \synptr -> do
-         let flstate = FluidState
-              { fsSettingsPtr = setptr
-              , _synthPtr = synptr
-              , _audioDriver = Nothing
-              }
-         ref <- newIORef flstate
-         res <- bracket (newStablePtr ref) freeStablePtr $ \ptr ->
-            runReaderT syn (castStablePtrToPtr ptr, ref)
-         curstate <- readIORef ref
-         releaseResources curstate
-         return res
+      bracket (initState setptr) releaseState $ \(ref, ptr) ->
+         runReaderT syn (castStablePtrToPtr ptr, ref)
+ where initState setptr = do
+          synptr <- c'new_fluid_synth setptr
+          let flstate = FluidState
+               { fsSettingsPtr = setptr
+               , _synth = Synth synptr
+               , _audioDriver = Nothing
+               }
+          ref <- newIORef flstate
+          ptr <- newStablePtr ref
+          return (ref, ptr)
+       releaseState (ref, ptr) = do
+          curstate <- readIORef ref
+          freeStablePtr ptr
+          releaseResources curstate
