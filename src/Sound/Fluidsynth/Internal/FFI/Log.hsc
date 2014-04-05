@@ -19,5 +19,3 @@ import Sound.Fluidsynth.Internal.FFI.Types
 #ccall fluid_set_log_function , <fluid_log_level> -> <fluid_log_function_t> -> Ptr () -> IO <fluid_log_function_t>
 
 #ccall fluid_default_log_function , <fluid_log_level> -> CString -> Ptr () -> IO ()
-
--- TODO: Add fluid_log

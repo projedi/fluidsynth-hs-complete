@@ -21,6 +21,7 @@ library
   exposed-modules:   Sound.Fluidsynth
                    , Sound.Fluidsynth.Audio
                    , Sound.Fluidsynth.Event
+                   , Sound.Fluidsynth.Log
                    , Sound.Fluidsynth.Settings
                    , Sound.Fluidsynth.Types
   extra-libraries:   fluidsynth
