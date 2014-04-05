@@ -16,9 +16,6 @@ module Sound.Fluidsynth.Log
    , setLogger
    ) where
 
-import Control.Applicative
-import Control.Monad
-
 import Control.Monad.Trans(liftIO)
 import Control.Exception(assert)
 import Foreign.C.String(peekCString, withCString)
@@ -55,7 +52,7 @@ type Logger = LogLevel -> String -> FluidSynth ()
 
 -- | Will just print to stderr
 defaultLogger :: Logger
-defaultLogger lvl str = FluidSynth $ do
+defaultLogger lvl str = FluidSynth $
    liftIO $ withCString str $ \cstr ->
       c'fluid_default_log_function (llToC lvl) cstr nullPtr
 

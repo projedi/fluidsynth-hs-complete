@@ -27,7 +27,8 @@ library
                    , Sound.Fluidsynth.Settings
                    , Sound.Fluidsynth.Types
   extra-libraries:   fluidsynth
-  ghc-options:       -Wall -fno-warn-unused-imports
+  ghc-options:       -Wall -fwarn-tabs -fwarn-incomplete-record-updates
+                     -fwarn-monomorphism-restriction -fwarn-unused-do-bind
   hs-source-dirs:    src/
   other-modules:     Sound.Fluidsynth.Internal.FFI.Audio
                    , Sound.Fluidsynth.Internal.FFI.Event

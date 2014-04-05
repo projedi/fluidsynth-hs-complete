@@ -47,16 +47,11 @@ module Sound.Fluidsynth.Midi
    , setMidiPlayerCallback
    ) where
 
-import Control.Applicative
 import Control.Lens
-import Control.Monad
-
-import Foreign.Ptr(Ptr)
 
 import Sound.Fluidsynth.Internal.Event
    (Channel, Control, Key, Pitch, PresetNum, Pitch, Value, Velocity)
 import Sound.Fluidsynth.Internal.FFI.Midi
-import Sound.Fluidsynth.Internal.FFI.Types
 import Sound.Fluidsynth.Internal.Types
 
 data MidiEvent = MidiEvent

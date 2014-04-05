@@ -23,7 +23,6 @@ module Sound.Fluidsynth.Internal.Event
 
 import Control.Applicative
 import Control.Lens
-import Control.Monad
 
 import Foreign.Ptr(Ptr, nullPtr)
 
@@ -145,8 +144,8 @@ parseEvent p = do
    sf <- fi <$> c'fluid_event_get_sfont_id p
    s <- fi <$> c'fluid_event_get_source p 
    d <- fi <$> c'fluid_event_get_dest p
-   return $ SeqEvent <$> (getType t c k ve ct va pr da du b pt sf) <*> (pure s) <*> (pure d)
- where getType t c k ve ct va pr da du b pt sf =
+   return $ SeqEvent <$> getType t c k ve ct va pr da du b pt sf <*> pure s <*> pure d
+ where getType t c k ve ct va pr _ du b pt sf =
           case () of
            _ | t == c'FLUID_SEQ_NOTE -> Just $ SeqNote c k ve du
              | t == c'FLUID_SEQ_NOTEON -> Just $ SeqNoteOn c k ve

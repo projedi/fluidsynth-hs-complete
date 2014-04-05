@@ -21,7 +21,6 @@ module Sound.Fluidsynth.Internal.Types
    ) where
 
 import Control.Applicative
-import Control.Monad
 
 import Control.Exception(bracket)
 import Control.Lens(makeLenses)
@@ -32,7 +31,6 @@ import Data.IORef(IORef, newIORef, readIORef, writeIORef)
 import Foreign
    ( Ptr
    , castPtr
-   , StablePtr
    , newStablePtr
    , deRefStablePtr
    , freeStablePtr

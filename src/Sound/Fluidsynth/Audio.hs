@@ -21,18 +21,15 @@ module Sound.Fluidsynth.Audio
    , deleteAudioDriver
    ) where
 
-import Control.Applicative
 import Control.Lens
 import Control.Monad
 
 import Control.Monad.Trans(liftIO)
-import Data.Maybe(isNothing)
 import Foreign.Marshal.Array(peekArray, pokeArray)
 import Foreign.Ptr(nullPtr)
 
 import Sound.Fluidsynth.Internal.FFI.Audio
 import Sound.Fluidsynth.Internal.FFI.Misc
-import Sound.Fluidsynth.Internal.FFI.Types
 import Sound.Fluidsynth.Internal.Types
 
 -- TODO: What about error handling.

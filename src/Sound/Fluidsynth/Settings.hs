@@ -50,7 +50,6 @@ module Sound.Fluidsynth.Settings
    ) where
 
 import Control.Applicative
-import Control.Monad
 
 import Control.Arrow((***))
 import Control.Exception(assert)
@@ -59,7 +58,7 @@ import Data.IORef(modifyIORef, newIORef, readIORef)
 import Foreign.C.String(CString, newCString, peekCString, withCString)
 import Foreign.C.Types(CInt)
 import Foreign.Marshal.Alloc(alloca)
-import Foreign.Ptr(Ptr, castPtr, nullPtr)
+import Foreign.Ptr(Ptr, nullPtr)
 import Foreign.Storable(Storable, peek)
 
 import Sound.Fluidsynth.Internal.FFI.Settings
