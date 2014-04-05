@@ -5,5 +5,6 @@ module Sound.Fluidsynth(module X) where
 import Sound.Fluidsynth.Audio as X
 import Sound.Fluidsynth.Event as X
 import Sound.Fluidsynth.Log as X
+import Sound.Fluidsynth.Midi as X
 import Sound.Fluidsynth.Settings as X
 import Sound.Fluidsynth.Types as X

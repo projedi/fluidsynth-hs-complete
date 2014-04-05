@@ -3,7 +3,10 @@
 module Sound.Fluidsynth.Internal.Types
    ( AudioDriver(..)
    , FluidState
+   , MidiPlayer(..)
    , FluidSynth(..)
+   , MidiDriver(..)
+   , MidiRouter(..)
    , MonadSettings(..)
    , ReleaseResources(..)
    , Settings
@@ -11,6 +14,9 @@ module Sound.Fluidsynth.Internal.Types
    , withSettingsRunFluid
    -- Lenses from FluidState
    , audioDriver
+   , midiPlayers
+   , midiDriver
+   , midiRouter
    , synth
    ) where
 
@@ -37,6 +43,11 @@ import Foreign
 import Sound.Fluidsynth.Internal.FFI.Audio
    ( c'delete_fluid_audio_driver
    , c'delete_fluid_file_renderer
+   )
+import Sound.Fluidsynth.Internal.FFI.Midi
+   ( c'delete_fluid_midi_router
+   , c'delete_fluid_midi_driver
+   , c'delete_fluid_player
    )
 import Sound.Fluidsynth.Internal.FFI.Settings
    ( c'new_fluid_settings
@@ -93,17 +104,38 @@ instance ReleaseResources AudioDriver where
    releaseResources (FileRenderer fptr) =
       c'delete_fluid_file_renderer fptr
 
+newtype MidiRouter = MidiRouter (Ptr C'fluid_midi_router_t)
+
+instance ReleaseResources MidiRouter where
+   releaseResources (MidiRouter ptr) = c'delete_fluid_midi_router ptr
+
+newtype MidiDriver = MidiDriver (Ptr C'fluid_midi_driver_t)
+
+instance ReleaseResources MidiDriver where
+   releaseResources (MidiDriver ptr) = c'delete_fluid_midi_driver ptr
+
+newtype MidiPlayer = MidiPlayer (Ptr C'fluid_player_t)
+
+instance ReleaseResources MidiPlayer where
+   releaseResources (MidiPlayer ptr) = c'delete_fluid_player ptr
+
 data FluidState = FluidState
    { fsSettingsPtr :: Ptr C'fluid_settings_t -- we have settingsPtr in MonadSettings
    , _synth :: Synth
    , _audioDriver :: Maybe AudioDriver
+   , _midiRouter :: Maybe MidiRouter
+   , _midiDriver :: Maybe MidiDriver
+   , _midiPlayers :: [MidiPlayer]
    }
 
 instance ReleaseResources FluidState where
    -- The first one is handled separately in the withSettingsRunFluid
-   releaseResources (FluidState _ a1 a2) = do
+   releaseResources (FluidState _ a1 a2 a3 a4 a5) = do
       releaseResources a1
       releaseResources a2
+      releaseResources a3
+      releaseResources a4
+      releaseResources a5
 
 makeLenses ''FluidState
 
@@ -145,6 +177,9 @@ withSettingsRunFluid (Settings set) (FluidSynth (ReaderFluidState syn)) =
                { fsSettingsPtr = setptr
                , _synth = Synth synptr
                , _audioDriver = Nothing
+               , _midiRouter = Nothing
+               , _midiDriver = Nothing
+               , _midiPlayers = []
                }
           ref <- newIORef flstate
           ptr <- newStablePtr ref

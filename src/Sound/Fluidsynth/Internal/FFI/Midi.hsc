@@ -28,7 +28,7 @@ import Sound.Fluidsynth.Internal.FFI.Types
 #ccall fluid_midi_event_set_pitch , Ptr <fluid_midi_event_t> -> CInt -> IO CInt
 
 -- pointer to SYSEX data, size of SYSEX data, true if the SYSEX data should be freed
-#ccall fluid_midi_event_set_sysex , Ptr <fluid_midi_event_t> -> Ptr a -> CInt -> CInt -> IO CInt
+#ccall fluid_midi_event_set_sysex , Ptr <fluid_midi_event_t> -> Ptr () -> CInt -> CInt -> IO CInt
 
 #integral_t fluid_midi_router_rule_type
 #num FLUID_MIDI_ROUTER_RULE_NOTE
@@ -47,6 +47,7 @@ import Sound.Fluidsynth.Internal.FFI.Types
 #ccall fluid_midi_router_set_default_rules , Ptr <fluid_midi_router_t> -> IO CInt
 #ccall fluid_midi_router_clear_rules , Ptr <fluid_midi_router_t> -> IO CInt
 #ccall fluid_midi_router_add_rule , Ptr <fluid_midi_router_t> -> Ptr <fluid_midi_router_rule_t> -> <fluid_midi_router_rule_type> -> IO CInt
+
 #ccall new_fluid_midi_router_rule , IO (Ptr <fluid_midi_router_rule_t>)
 #ccall delete_fluid_midi_router_rule , Ptr <fluid_midi_router_rule_t> -> IO ()
 -- min, max, mul, add
@@ -55,7 +56,9 @@ import Sound.Fluidsynth.Internal.FFI.Types
 #ccall fluid_midi_router_rule_set_param1 , Ptr <fluid_midi_router_rule_t> -> CInt -> CInt -> CFloat -> CInt -> IO ()
 -- min, max, mul, add
 #ccall fluid_midi_router_rule_set_param2 , Ptr <fluid_midi_router_rule_t> -> CInt -> CInt -> CFloat -> CInt -> IO ()
+
 #ccall fluid_midi_router_handle_midi_event , Ptr <fluid_midi_router_t> -> Ptr <fluid_midi_event_t> -> IO CInt
+
 #ccall fluid_midi_dump_prerouter , Ptr <fluid_midi_router_t> -> Ptr <fluid_midi_event_t> -> IO CInt
 #ccall fluid_midi_dump_postrouter , Ptr <fluid_midi_router_t> -> Ptr <fluid_midi_event_t> -> IO CInt
 

@@ -2,6 +2,7 @@ module Sound.Fluidsynth.Types
    ( MonadSettings
    , Settings
    , FluidSynth
+   , MidiPlayer
    , withSettingsRunFluid
    ) where
 
