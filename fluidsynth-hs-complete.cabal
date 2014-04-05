@@ -23,6 +23,7 @@ library
                    , Sound.Fluidsynth.Event
                    , Sound.Fluidsynth.Log
                    , Sound.Fluidsynth.Midi
+                   , Sound.Fluidsynth.Misc
                    , Sound.Fluidsynth.Settings
                    , Sound.Fluidsynth.Types
   extra-libraries:   fluidsynth
