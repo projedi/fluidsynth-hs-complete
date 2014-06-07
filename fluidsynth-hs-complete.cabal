@@ -25,6 +25,7 @@ library
                    , Sound.Fluidsynth.Midi
                    , Sound.Fluidsynth.Misc
                    , Sound.Fluidsynth.Settings
+                   , Sound.Fluidsynth.Synth
                    , Sound.Fluidsynth.Types
   extra-libraries:   fluidsynth
   ghc-options:       -Wall -fwarn-tabs -fwarn-incomplete-record-updates

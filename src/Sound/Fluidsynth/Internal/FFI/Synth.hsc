@@ -11,7 +11,7 @@ import Sound.Fluidsynth.Internal.FFI.Types
 
 #starttype struct _fluid_synth_channel_info_t
 -- This one is actually one bit + 31 reserved flag bits
--- TODO: Use this bitfield
+-- TODO: Cannot use this bit-field directly.
 -- #field assigned , CInt
 #field sfont_id , CInt
 #field bank , CInt

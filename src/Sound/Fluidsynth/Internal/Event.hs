@@ -61,7 +61,7 @@ data SeqEventType
    = SeqNote Channel Key Velocity Duration
    | SeqNoteOn Channel Key Velocity
    | SeqNoteOff Channel Key
-   | SeqAllSoundsOff Channel
+   | SeqAllSoundsOff Channel -- ^ All notes are terminated without going through off phase.
    | SeqAllNotesOff Channel
    | SeqBankSelect Channel BankNum
    | SeqProgramChange Channel PresetNum
