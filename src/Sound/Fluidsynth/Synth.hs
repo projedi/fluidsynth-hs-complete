@@ -1,72 +1,103 @@
+{-# LANGUAGE TemplateHaskell #-}
 module Sound.Fluidsynth.Synth
-   (
+   ( -- * MIDI channel messages
+     ChannelInfo(..)
+   , channelInfoSoundFontID
+   , channelInfoBankNumber
+   , channelInfoProgramNumber
+   , channelInfoName
+   , ChannelType(..)
+   , SYSEX
+   , SynthEventType(..)
+   , getChannelInfo
+   , getControlValue
+   , getPitchBend
+   , getPitchWheelSensitivity
+   , getProgram
+   , sendSYSEX
+   , sendSynthEvent
    ) where
+
+import Control.Lens
 
 import Sound.Fluidsynth.Internal.FFI.Synth
 import Sound.Fluidsynth.Internal.FFI.Types
+import Sound.Fluidsynth.Internal.Types
 import qualified Sound.Fluidsynth.Internal.Event as Event
 
 -- TODO: Implement _assigned :: Bool
 data ChannelInfo = ChannelInfo
-   { _soundFontID :: Event.SoundfontID
-   , _bankNumber :: Event.BankNum
-   , _programNumber :: Event.PresetNum
-   , _name :: String
+   { _channelInfoSoundFontID :: Event.SoundFontID
+   , _channelInfoBankNumber :: Event.BankNum
+   , _channelInfoProgramNumber :: Event.PresetNum
+   , _channelInfoName :: String
    }
 
--- Corresponding to Event.SeqEventType:
--- note
-noteon :: Event.Channel -> Event.Key -> Event.Velocity -> FluidSynth Bool
-noteoff :: Event.Channel -> Event.Key -> FluidSynth Bool
-all_sounds_off :: Event.Channel -> FluidSynth Bool
-all_notes_off :: Event.Channel -> FluidSynth Bool
-bank_select :: Event.Channel -> Event.BankNum -> FluidSynth Bool
-program_change :: Event.Channel -> Event.PresetNum -> FluidSynth Bool
-program_select :: Event.Channel -> Event.SounfontID -> Event.BankNum -> Event.PresetNum -> FluidSynth Bool
-pitch_bend :: Event.Channel -> Event.Pitch -> FluidSynth Bool
-pitch_wheel_sens :: Event.Channel -> Event.Value ->  FluidSynth Bool
--- modulation
--- sustain
-cc :: Event.Channel -> Event.Control -> Event.Value -> FluidSynth Bool
--- pan
--- volume
--- reverbsend
--- chorussend
--- timer
--- anycontrolchange
-channel_pressure :: Event.Channel -> Event.Value -> FluidSynth Bool
-system_reset :: FluidSynth Bool
-
-get_cc :: Event.Channel -> Event.Control -> FluidSynth (Maybe Bool)
-sysex :: String -> Bool -> FluidSynth (Maybe (String, Bool))
-get_pitch_bend :: Event.Channel -> FluidSynth (Maybe Event.Pitch)
-get_pitch_wheel_sens :: Event.Channel -> FluidSynth (Maybe Event.Value)
-sfont_select :: Event.Channel -> Event.SoundfontID -> FluidSynth Bool
-program_select_by_sfont_name :: Event.Channel -> String -> Event.BankNum -> Event.PresetNum -> FluidSynth Bool
-get_program :: Event.Channel -> FluidSynth (Maybe (Event.SoundfontID, Event.BankNum, Event.PresetNum)
-unset_program :: Event.Channel -> FluidSynth Bool
-get_channel_info :: Event.Channel -> FluidSynth (Maybe ChannelInfo)
-program_reset :: FluidSynth Bool
+makeLenses ''ChannelInfo
 
 data ChannelType = ChannelTypeMelodic | ChannelTypeDrum
 
-set_channel_type :: Event.Channel -> ChannelType -> FluidSynth Bool
+data SynthEventType
+   = SynthNoteOn Event.Channel Event.Key Event.Velocity
+   | SynthNoteOff Event.Channel Event.Key
+   | SynthControlChange Event.Channel Event.Control Event.Value
+   | SynthPitchBend Event.Channel Event.Pitch
+   | SynthPitchWheelSensitivity Event.Channel Event.Value
+   | SynthProgramChange Event.Channel Event.PresetNum
+   | SynthChannelPressure Event.Channel Event.Value
+   | SynthBankSelect Event.Channel Event.BankNum
+   | SynthSoundFontSelect Event.Channel Event.SoundFontID
+   | SynthProgramSelect Event.Channel Event.SoundFontID Event.BankNum Event.PresetNum
+   | SynthProgramSelectBySoundFontName Event.Channel String Event.BankNum Event.PresetNum
+   | SynthUnsetProgram Event.Channel
+   | SynthProgramReset
+   | SynthSystemReset
+   | SynthAllNotesOff Event.Channel
+   | SynthAllSoundsOff Event.Channel
+   | SynthSetChannelType Event.Channel ChannelType
 
+sendSynthEvent :: SynthEventType -> FluidSynth Bool
+sendSynthEvent = undefined
+
+getControlValue :: Event.Channel -> Event.Control -> FluidSynth (Maybe Event.Value)
+getControlValue = undefined
+
+type SYSEX = String
+
+-- TODO: should try different response_len while fluid_synth_sysex fails with FLUID_FAILED
+sendSYSEX :: SYSEX
+          -> Bool -- ^ Do a dry run? Helpfull for checking if SYSEX would be handled.
+          -> FluidSynth (Maybe String) -- ^ Nothing if SYSEX is not handled, Just response otherwise
+sendSYSEX = undefined
+
+getPitchBend :: Event.Channel -> FluidSynth (Maybe Event.Pitch)
+getPitchBend = undefined
+
+getPitchWheelSensitivity :: Event.Channel -> FluidSynth (Maybe Event.Value)
+getPitchWheelSensitivity = undefined
+
+getProgram :: Event.Channel -> FluidSynth (Maybe (Event.SoundFontID, Event.BankNum, Event.PresetNum))
+getProgram = undefined
+
+getChannelInfo :: Event.Channel -> FluidSynth (Maybe ChannelInfo)
+getChannelInfo = undefined
+
+{-
 -- Also after Preset there is an unused argument(set it to 0)
 start :: VoiceGroupID -> Preset -> Event.Channel -> Event.Key -> Event.Velocity -> FluidSynth Bool
 stop :: VoiceGroupID -> FluidSynth Bool
 
-sfload :: String -> Bool -> FluidSynth (Maybe Event.SoundfontID)
-sfreload :: Event.SoundfontID -> FluidSynth (Maybe Event.SoundfontID)
-sfunload :: Event.SoundfontID -> Bool -> FluidSynth Bool
-add_sfont :: Soundfont -> FluidSynth (Maybe Event.SoundfontID)
-remove_sfont :: Soundfont -> FluidSynth ()
+sfload :: String -> Bool -> FluidSynth (Maybe Event.SoundFontID)
+sfreload :: Event.SoundFontID -> FluidSynth (Maybe Event.SoundFontID)
+sfunload :: Event.SoundFontID -> Bool -> FluidSynth Bool
+add_sfont :: SoundFont -> FluidSynth (Maybe Event.SoundFontID)
+remove_sfont :: SoundFont -> FluidSynth ()
 sfcount :: FluidSynth Int
-get_sfont :: Int -> FluidSynth (Maybe Soundfont)
-get_sfont_by_id :: Event.SoundfontID -> FluidSynth (Maybe Soundfont)
-get_sfont_by_name :: String -> FluidSynth (Maybe Soundfont)
-get_bank_offset :: Event.SoundfontID -> FluidSynth Int
-set_bank_offset :: Event.SoundfontID -> Int -> FluidSynth Bool
+get_sfont :: Int -> FluidSynth (Maybe SoundFont)
+get_sfont_by_id :: Event.SoundFontID -> FluidSynth (Maybe SoundFont)
+get_sfont_by_name :: String -> FluidSynth (Maybe SoundFont)
+get_bank_offset :: Event.SoundFontID -> FluidSynth Int
+set_bank_offset :: Event.SoundFontID -> Int -> FluidSynth Bool
 
 -- 0.0 - 1.2
 type ReverbRoomsize = Double
@@ -194,3 +225,5 @@ start_voice :: Voice -> FluidSynth ()
 get_voicelist :: VoiceID -> FluidSynth [Voice]
 
 handle_midi_event :: HandleMidiEvent
+
+-}
