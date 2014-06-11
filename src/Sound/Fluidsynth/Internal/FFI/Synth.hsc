@@ -138,7 +138,7 @@ import Sound.Fluidsynth.Internal.FFI.Types
 #ccall fluid_synth_count_audio_groups , Ptr <fluid_synth_t> -> IO CInt
 #ccall fluid_synth_count_effects_channels , Ptr <fluid_synth_t> -> IO CInt
 
--- Synthesis parameters */
+-- Synthesis parameters
 
 #ccall fluid_synth_set_sample_rate , Ptr <fluid_synth_t> -> CFloat -> IO ()
 #ccall fluid_synth_set_gain , Ptr <fluid_synth_t> -> CFloat -> IO ()

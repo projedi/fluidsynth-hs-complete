@@ -16,6 +16,22 @@ module Sound.Fluidsynth.Synth
    , getProgram
    , sendSYSEX
    , sendSynthEvent
+   -- * Low level access
+   , AudioChannel
+   , Preset(..)
+   , VoiceGroupID
+   , start
+   , stop
+   -- * SoundFont management
+   -- * Reverb
+   -- * Chorus
+   -- * Audio and MIDI channels
+   -- * Synthesis parameters
+   -- * Generator interface
+   -- * Tuning
+   -- * Misc
+   -- * Synthesizer plugin
+   -- * Synthesizer's interface to handle SoundFont loaders
    ) where
 
 import Control.Lens
@@ -82,11 +98,26 @@ getProgram = undefined
 getChannelInfo :: Event.Channel -> FluidSynth (Maybe ChannelInfo)
 getChannelInfo = undefined
 
-{-
--- Also after Preset there is an unused argument(set it to 0)
-start :: VoiceGroupID -> Preset -> Event.Channel -> Event.Key -> Event.Velocity -> FluidSynth Bool
-stop :: VoiceGroupID -> FluidSynth Bool
+type VoiceGroupID = Int
 
+newtype Preset = Preset C'fluid_preset_t
+
+type AudioChannel = Int
+
+-- | Must be called on synth thread (includes SoundFont noteon method)
+start :: VoiceGroupID
+      -> Preset
+      -> AudioChannel -- ^ unused as of 1.1.6
+      -> Event.Channel
+      -> Event.Key
+      -> Event.Velocity
+      -> FluidSynth Bool
+start = undefined
+
+stop :: VoiceGroupID -> FluidSynth Bool
+stop = undefined
+
+{-
 sfload :: String -> Bool -> FluidSynth (Maybe Event.SoundFontID)
 sfreload :: Event.SoundFontID -> FluidSynth (Maybe Event.SoundFontID)
 sfunload :: Event.SoundFontID -> Bool -> FluidSynth Bool
