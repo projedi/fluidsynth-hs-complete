@@ -136,6 +136,7 @@ set_polyphony :: Polyphony -> FluidSynth ()
 get_polyphony :: FluidSynth Polyphony
 get_active_voice_count :: FluidSynth Int
 get_internal_bufsize :: FluidSynth Int
+-- TODO: Ok, this Maybe Event.Channel must go for some custom "AnyChannel | Channel Channel"
 -- Nothing for all channels
 set_interp_method :: Maybe Event.Channel -> InterpolationMethod -> FluidSynth Bool
 
@@ -146,8 +147,50 @@ interpolation_highest :: InterapolationMethod
 type GenType = Int
 type GenValue = Float
 
--- TODO: Ok, this Maybe Event.Channel must go for some custom "AnyChannel | Channel Channel"
 
 set_gen :: Event.Channel -> GenType -> GenValue -> FluidSynth Bool
 set_gen2 :: Event.Channel -> GenType -> GenValue -> Bool -> Bool -> FluidSynth Bool
 get_gen :: Event.Channel -> GenType -> FluidSynth GenValue
+
+-- 0 - 127
+type TuningBank = Int
+-- 0 - 127
+type TuningPreset = Int
+type Cent = Float
+-- length of 128; normally 0 = 0, 1 = 100, 60 = 6000
+type CentArrayPitch = [Cent]
+-- length of 12; starting from C
+type CentArrayOctave = [Cent]
+type KeyCentArray = [(Event.Key, Cent)]
+
+-- empty CentArray(NULL) is for a well-tempered scale
+create_key_tuning :: TuningBank -> TuningPreset -> String -> CentArrayPitch -> FluidSynth Bool
+activate_key_tuning :: TuningBank -> TuningPreset -> String -> CentArrayPitch -> Bool -> FluidSynth Bool
+create_octave_tuning :: TuningBank -> TuningPreset -> String -> CentArrayOctave -> FluidSynth Bool
+activate_octave_tuning :: TuningBank -> TuningPreset -> String -> CentArrayOctave -> Bool -> FluidSynth Bool
+tune_notes :: TuningBank -> TuningPreset -> KeyCentArray -> Bool -> FluidSynth Bool
+select_tuning :: Event.Channel -> TuningBank -> TuningPreset -> FluidSynth Bool
+activate_tuning :: Event.Channel -> TuningBank -> TuningPreset -> Bool -> FluidSynth Bool
+reset_tuning :: Event.Channel -> FluidSynth Bool
+deactivate_tuning :: Event.Channel -> Bool -> FluidSynth Bool
+tuning_iteration_start :: FluidSynth ()
+tuning_iteration_next :: FluidSynth (Maybe (TuningBank, TuningPreset))
+tuning_dump :: TuningBank -> TuningPreset -> FluidSynth (Maybe (String, CentArrayPitch))
+
+-- in percentage
+get_cpu_load :: FluidSynth Double
+get_synth_error :: FluidSynth String
+
+-- all of them only on synth thread
+write_s16 :: [Word16] -> Int -> Int -> [Word16] -> Int -> Int -> FluidSynth Bool
+write_float :: [Float] -> Int -> Int -> [Float] -> Int -> Int -> FluidSynth Bool
+nwrite_float :: [(Float, Float)] -> FluidSynth Bool
+process :: AudioCallback
+
+add_sfloader :: SoundFontLoader -> FluidSynth ()
+-- next 3 only on synth thread
+alloc_voice :: Sample -> Event.Channel -> Event.Key -> Event.Velocity -> FluidSynth (Maybe Voice)
+start_voice :: Voice -> FluidSynth ()
+get_voicelist :: VoiceID -> FluidSynth [Voice]
+
+handle_midi_event :: HandleMidiEvent

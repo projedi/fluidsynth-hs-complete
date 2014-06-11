@@ -96,6 +96,7 @@ makeLenses ''MidiRouterRule
 
 type HandleMidiEvent = MidiEvent -> FluidSynth Bool
 
+-- TODO: Must use set_midi_router from synth.h
 replaceMidiRouter :: HandleMidiEvent -> FluidSynth Bool
 replaceMidiRouter = undefined
 
