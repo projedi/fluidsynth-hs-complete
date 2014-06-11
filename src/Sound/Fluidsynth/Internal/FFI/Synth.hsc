@@ -77,14 +77,17 @@ import Sound.Fluidsynth.Internal.FFI.Types
 #ccall fluid_synth_set_channel_type , Ptr <fluid_synth_t> -> CInt -> CInt -> IO CInt
 
 -- Low level access
+
+-- deprecated
 #ccall fluid_synth_get_channel_preset , Ptr <fluid_synth_t> -> CInt -> IO (Ptr <fluid_preset_t>)
 #ccall fluid_synth_start , Ptr <fluid_synth_t> -> CUInt -> Ptr <fluid_preset_t> -> CInt -> CInt -> CInt -> CInt -> IO CInt
 #ccall fluid_synth_stop , Ptr <fluid_synth_t> -> CUInt -> IO CInt
 
 -- SoundFont management
+
 #ccall fluid_synth_sfload , Ptr <fluid_synth_t> -> CString -> CInt -> IO CInt
 #ccall fluid_synth_sfreload , Ptr <fluid_synth_t> -> CString -> CUInt -> IO CInt
-#ccall fluid_synth_sfunload , Ptr <fluid_synth_t> -> CString -> CUInt -> CInt -> IO CInt
+#ccall fluid_synth_sfunload , Ptr <fluid_synth_t> -> CUInt -> CInt -> IO CInt
 #ccall fluid_synth_add_sfont , Ptr <fluid_synth_t> -> Ptr <fluid_sfont_t> -> IO CInt
 #ccall fluid_synth_remove_sfont , Ptr <fluid_synth_t> -> Ptr <fluid_sfont_t> -> IO ()
 #ccall fluid_synth_sfcount , Ptr <fluid_synth_t> -> IO CInt
