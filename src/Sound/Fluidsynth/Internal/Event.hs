@@ -6,7 +6,7 @@ module Sound.Fluidsynth.Internal.Event
    , Duration
    , BankNum
    , PresetNum
-   , SoundfontID
+   , SoundFontID
    , Value
    , Control
    , ClientID
@@ -45,7 +45,7 @@ type BankNum = Int
 -- | 0 - 127
 type PresetNum = Int
 
-type SoundfontID = Int
+type SoundFontID = Int
 
 type Value = Int
 
@@ -65,7 +65,7 @@ data SeqEventType
    | SeqAllNotesOff Channel
    | SeqBankSelect Channel BankNum
    | SeqProgramChange Channel PresetNum
-   | SeqProgramSelect Channel SoundfontID BankNum PresetNum
+   | SeqProgramSelect Channel SoundFontID BankNum PresetNum
    | SeqPitchBend Channel Pitch
    | SeqPitchWheelSensitivity Channel Value -- ^ TODO: What are the units
    | SeqModulation Channel Value -- ^ 0 - 127

@@ -5,7 +5,7 @@ module Sound.Fluidsynth.Event
    , Duration
    , BankNum
    , PresetNum
-   , SoundfontID
+   , SoundFontID
    , Value
    , Control
    , ClientID
