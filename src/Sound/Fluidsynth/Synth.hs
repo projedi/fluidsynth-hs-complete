@@ -46,6 +46,17 @@ module Sound.Fluidsynth.Synth
    , setReverbOn
    , setReverbParams
    -- * Chorus
+   , ChorusParams(..)
+   , ChorusType(..)
+   , chorusVoiceCount
+   , chorusLevel
+   , chorusSpeed
+   , chorusDepth
+   , chorusType
+   , defaultChorusParams
+   , getChorusParams
+   , setChorusOn
+   , setChorusParams
    -- * Audio and MIDI channels
    -- * Synthesis parameters
    -- * Generator interface
@@ -211,34 +222,33 @@ setReverbOn = undefined
 defaultReverbParams :: ReverbParams
 defaultReverbParams = undefined
 
-{-
 ----- Chorus -----
 
-data ChorusMod = ChorusModSine | ChorusModTriangle
+data ChorusType = ChorusTypeSine | ChorusTypeTriangle
 
--- 0 - 99
-type ChorusVoiceCount = Int
--- 0.0 - 10.0
-type ChorusLevel = Double
--- 0.29 - 5.0; in Hz
-type ChorusSpeed = Double
--- depends on synth sample rate; 0.0 - 21.0 is safe for sample rate up to 96 KHz; in ms
-type ChorusDepth = Double
+data ChorusParams = ChorusParams
+   { _chorusVoiceCount :: Int -- ^ @ 0 - 99 @
+   , _chorusLevel :: Double -- ^ @ 0 - 10 @
+   , _chorusSpeed :: Double -- ^ @ 0.29 - 5.0; @ in Hz
+   , _chorusDepth :: Double -- ^ Depends on sample rate; @ 0.0 - 21.0 @ is safe up to 96 kHz; in ms
+   , _chorusType :: ChorusType
+   }
 
-set_chorus :: ChorusVoiceCount -> ChorusLevel -> ChorusSpeed -> ChorusDepth -> ChorusMod -> FluidSynth ()
-set_chorus_on :: Bool -> FluidSynth ()
-get_chorus_nr :: FluidSynth ChorusVoiceCount
-get_chorus_level :: FluidSynth ChorusLevel
-get_chorus_speed_Hz :: FluidSynth ChorusSpeed
-get_chorus_depth_ms :: FluidSynth ChorusDepth
-get_chorus_type :: FluidSynth ChorusMod
+makeLenses ''ChorusParams
 
-default_chorus_nr :: ChorusVoiceCount
-default_chorus_level :: ChorusLevel
-default_chorus_speed :: ChorusSpeed
-default_chorus_depth :: ChorusDepth
-default_chorus_type :: ChorusMod
+setChorusParams :: ChorusParams -> FluidSynth ()
+setChorusParams = undefined
 
+getChorusParams :: FluidSynth ChorusParams
+getChorusParams = undefined
+
+setChorusOn :: Bool -> FluidSynth ()
+setChorusOn = undefined
+
+defaultChorusParams :: ChorusParams
+defaultChorusParams = undefined
+
+{-
 ----- Audio and MIDI channels -----
 
 count_midi_channels :: FluidSynth Int
