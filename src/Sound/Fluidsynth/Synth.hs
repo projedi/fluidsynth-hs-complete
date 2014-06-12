@@ -23,6 +23,18 @@ module Sound.Fluidsynth.Synth
    , start
    , stop
    -- * SoundFont management
+   , SoundFont(..)
+   , addSoundFont
+   , getBankOffset
+   , getSoundFontByID
+   , getSoundFontByIndex
+   , getSoundFontByName
+   , removeSoundFont
+   , setBankOffset
+   , soundFontCount
+   , soundFontLoad
+   , soundFontReload
+   , soundFontUnload
    -- * Reverb
    -- * Chorus
    -- * Audio and MIDI channels
@@ -117,19 +129,51 @@ start = undefined
 stop :: VoiceGroupID -> FluidSynth Bool
 stop = undefined
 
-{-
-sfload :: String -> Bool -> FluidSynth (Maybe Event.SoundFontID)
-sfreload :: Event.SoundFontID -> FluidSynth (Maybe Event.SoundFontID)
-sfunload :: Event.SoundFontID -> Bool -> FluidSynth Bool
-add_sfont :: SoundFont -> FluidSynth (Maybe Event.SoundFontID)
-remove_sfont :: SoundFont -> FluidSynth ()
-sfcount :: FluidSynth Int
-get_sfont :: Int -> FluidSynth (Maybe SoundFont)
-get_sfont_by_id :: Event.SoundFontID -> FluidSynth (Maybe SoundFont)
-get_sfont_by_name :: String -> FluidSynth (Maybe SoundFont)
-get_bank_offset :: Event.SoundFontID -> FluidSynth Int
-set_bank_offset :: Event.SoundFontID -> Int -> FluidSynth Bool
+soundFontLoad :: String -- ^ filename
+              -> Bool -- ^ reset presets for all channels?
+              -> FluidSynth (Maybe Event.SoundFontID)
+soundFontLoad = undefined
 
+-- TODO: Event.SoundFontID must be an abstract newtype
+
+-- actually returns id but since it doesn't change let's not do that
+soundFontReload :: Event.SoundFontID -> FluidSynth Bool
+soundFontReload = undefined
+
+soundFontUnload :: Event.SoundFontID
+                -> Bool -- ^ reset presets for all channels?
+                -> FluidSynth Bool
+soundFontUnload = undefined
+
+newtype SoundFont = SoundFont C'fluid_sfont_t
+
+addSoundFont :: SoundFont -> FluidSynth (Maybe Event.SoundFontID)
+addSoundFont = undefined
+
+-- | Remove SoundFont from stack but without deleting it
+removeSoundFont :: SoundFont -> FluidSynth ()
+removeSoundFont = undefined
+
+-- | Number of loaded SoundFonts
+soundFontCount :: FluidSynth Int
+soundFontCount = undefined
+
+getSoundFontByIndex :: Int -> FluidSynth (Maybe SoundFont)
+getSoundFontByIndex = undefined
+
+getSoundFontByID :: Event.SoundFontID -> FluidSynth (Maybe SoundFont)
+getSoundFontByID = undefined
+
+getSoundFontByName :: String -> FluidSynth (Maybe SoundFont)
+getSoundFontByName = undefined
+
+getBankOffset :: Event.SoundFontID -> FluidSynth Int
+getBankOffset = undefined
+
+setBankOffset :: Event.SoundFontID -> Int -> FluidSynth Bool
+setBankOffset = undefined
+
+{-
 -- 0.0 - 1.2
 type ReverbRoomsize = Double
 -- 0.0 - 1.0
