@@ -36,6 +36,15 @@ module Sound.Fluidsynth.Synth
    , soundFontReload
    , soundFontUnload
    -- * Reverb
+   , ReverbParams(..)
+   , reverbRoomsize
+   , reverbDamping
+   , reverbWidth
+   , reverbLevel
+   , defaultReverbParams
+   , getReverbParams
+   , setReverbOn
+   , setReverbParams
    -- * Chorus
    -- * Audio and MIDI channels
    -- * Synthesis parameters
@@ -173,28 +182,28 @@ getBankOffset = undefined
 setBankOffset :: Event.SoundFontID -> Int -> FluidSynth Bool
 setBankOffset = undefined
 
+data ReverbParams = ReverbParams
+   { _reverbRoomsize :: Double -- ^ @ 0.0 - 1.2 @
+   , _reverbDamping :: Double -- ^ @ 0.0 - 1.0 @
+   , _reverbWidth :: Double -- ^ @ 0.0 - 100.0 @
+   , _reverbLevel :: Double -- ^ @ 0.0 - 1.0 @
+   }
+
+makeLenses ''ReverbParams
+
+setReverbParams :: ReverbParams -> FluidSynth ()
+setReverbParams = undefined
+
+getReverbParams :: FluidSynth ReverbParams
+getReverbParams = undefined
+
+setReverbOn :: Bool -> FluidSynth ()
+setReverbOn = undefined
+
+defaultReverbParams :: ReverbParams
+defaultReverbParams = undefined
+
 {-
--- 0.0 - 1.2
-type ReverbRoomsize = Double
--- 0.0 - 1.0
-type ReverbDamping = Double
--- 0.0 - 100.0
-type ReverbWidth = Double
--- 0.0 - 1.0
-type ReverbLevel = Double
-
-set_reverb :: ReverbRoomsize -> ReverbDamping -> ReverbWidth -> RevertLevel -> FluidSynth ()
-set_reverb_on :: Bool -> FluidSynth ()
-get_reverb_roomsize :: FluidSynth ReverbRoomsize
-get_reverb_damp :: FluidSynth ReverbDamp
-get_reverb_level :: FluidSynth ReverbLevel
-get_reverb_width :: FluidSynth ReverbWidth
-
-default_reverb_roomsize :: ReverbRoomsize
-default_reverb_damp :: ReverbDamp
-default_reverb_width :: ReverbWidth
-default_reverb_level :: ReverbLevel
-
 data ChorusMod = ChorusModSine | ChorusModTriangle
 
 -- 0 - 99
