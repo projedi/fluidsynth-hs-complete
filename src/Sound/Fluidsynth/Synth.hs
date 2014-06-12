@@ -63,6 +63,21 @@ module Sound.Fluidsynth.Synth
    , effectChannelCount
    , midiChannelCount
    -- * Synthesis parameters
+   , Gain
+   , InterpolationMethod(..)
+   , MaybeChannel(..)
+   , Polyphony
+   , SampleRate
+   , defaultInterpolationMethod
+   , getActiveVoiceCount
+   , getGain
+   , getInternalBufferSize
+   , getPolyphony
+   , highestInterpolationMethod
+   , setGain
+   , setInterpolationMethod
+   , setPolyphony
+   , setSampleRate
    -- * Generator interface
    -- * Tuning
    -- * Misc
@@ -268,31 +283,52 @@ audioGroupCount = undefined
 effectChannelCount :: FluidSynth Int
 effectChannelCount = undefined
 
-{-
 ----- Synthesis parameters -----
 
 type SampleRate = Float
+
 -- 0.0 - 10.0
 type Gain = Float
+
 type Polyphony = Int
+
 data InterpolationMethod =
    InterpolationNone | InterpolationLinear | Interpolation4thOrder | Interpolation7thOrder
 
--- experimental; do before any voice and notes are active and before rendering calls
-set_sample_rate :: SampleRate -> FluidSynth ()
-set_gain :: Gain -> FluidSynth ()
-get_gain :: FluidSynth Gain
-set_polyphony :: Polyphony -> FluidSynth ()
-get_polyphony :: FluidSynth Polyphony
-get_active_voice_count :: FluidSynth Int
-get_internal_bufsize :: FluidSynth Int
--- TODO: Ok, this Maybe Event.Channel must go for some custom "AnyChannel | Channel Channel"
--- Nothing for all channels
-set_interp_method :: Maybe Event.Channel -> InterpolationMethod -> FluidSynth Bool
+data MaybeChannel = AnyChannel | Channel Event.Channel
 
-interpolation_default :: InterpolationMethod
-interpolation_highest :: InterapolationMethod
+-- | Experimental; do before any voice and notes are active and before rendering calls
+setSampleRate :: SampleRate -> FluidSynth ()
+setSampleRate = undefined
 
+setGain :: Gain -> FluidSynth ()
+setGain = undefined
+
+getGain :: FluidSynth Gain
+getGain = undefined
+
+setPolyphony :: Polyphony -> FluidSynth ()
+setPolyphony = undefined
+
+getPolyphony :: FluidSynth Polyphony
+getPolyphony = undefined
+
+getActiveVoiceCount :: FluidSynth Int
+getActiveVoiceCount = undefined
+
+getInternalBufferSize :: FluidSynth Int
+getInternalBufferSize = undefined
+
+setInterpolationMethod :: MaybeChannel -> InterpolationMethod -> FluidSynth Bool
+setInterpolationMethod = undefined
+
+defaultInterpolationMethod :: InterpolationMethod
+defaultInterpolationMethod = undefined
+
+highestInterpolationMethod :: InterpolationMethod
+highestInterpolationMethod = undefined
+
+{-
 ----- Generator interface -----
 
 -- These two should be in Gen module and the first one is enum
