@@ -62,6 +62,8 @@ import Sound.Fluidsynth.Internal.FFI.Types
 import Sound.Fluidsynth.Internal.Types
 import qualified Sound.Fluidsynth.Internal.Event as Event
 
+----- MIDI Channel messages -----
+
 -- TODO: Implement _assigned :: Bool
 data ChannelInfo = ChannelInfo
    { _channelInfoSoundFontID :: Event.SoundFontID
@@ -119,6 +121,8 @@ getProgram = undefined
 getChannelInfo :: Event.Channel -> FluidSynth (Maybe ChannelInfo)
 getChannelInfo = undefined
 
+----- Low level accesss -----
+
 type VoiceGroupID = Int
 
 newtype Preset = Preset C'fluid_preset_t
@@ -137,6 +141,8 @@ start = undefined
 
 stop :: VoiceGroupID -> FluidSynth Bool
 stop = undefined
+
+----- SoundFont management -----
 
 soundFontLoad :: String -- ^ filename
               -> Bool -- ^ reset presets for all channels?
@@ -182,6 +188,8 @@ getBankOffset = undefined
 setBankOffset :: Event.SoundFontID -> Int -> FluidSynth Bool
 setBankOffset = undefined
 
+----- Reverb -----
+
 data ReverbParams = ReverbParams
    { _reverbRoomsize :: Double -- ^ @ 0.0 - 1.2 @
    , _reverbDamping :: Double -- ^ @ 0.0 - 1.0 @
@@ -204,6 +212,8 @@ defaultReverbParams :: ReverbParams
 defaultReverbParams = undefined
 
 {-
+----- Chorus -----
+
 data ChorusMod = ChorusModSine | ChorusModTriangle
 
 -- 0 - 99
@@ -229,12 +239,16 @@ default_chorus_speed :: ChorusSpeed
 default_chorus_depth :: ChorusDepth
 default_chorus_type :: ChorusMod
 
+----- Audio and MIDI channels -----
+
 count_midi_channels :: FluidSynth Int
 -- original: 1 = 2, 2 = 4; return a (*2)
 count_audio_channels :: FluidSynth Int
 -- original: 1 = 2, 2 = 4; return a (*2)
 count_audio_groups :: FluidSynth Int
 count_effect_channels :: FluidSynth Int
+
+----- Synthesis parameters -----
 
 type SampleRate = Float
 -- 0.0 - 10.0
@@ -258,6 +272,8 @@ set_interp_method :: Maybe Event.Channel -> InterpolationMethod -> FluidSynth Bo
 interpolation_default :: InterpolationMethod
 interpolation_highest :: InterapolationMethod
 
+----- Generator interface -----
+
 -- These two should be in Gen module and the first one is enum
 type GenType = Int
 type GenValue = Float
@@ -266,6 +282,8 @@ type GenValue = Float
 set_gen :: Event.Channel -> GenType -> GenValue -> FluidSynth Bool
 set_gen2 :: Event.Channel -> GenType -> GenValue -> Bool -> Bool -> FluidSynth Bool
 get_gen :: Event.Channel -> GenType -> FluidSynth GenValue
+
+----- Tuning -----
 
 -- 0 - 127
 type TuningBank = Int
@@ -292,15 +310,21 @@ tuning_iteration_start :: FluidSynth ()
 tuning_iteration_next :: FluidSynth (Maybe (TuningBank, TuningPreset))
 tuning_dump :: TuningBank -> TuningPreset -> FluidSynth (Maybe (String, CentArrayPitch))
 
+----- Misc -----
+
 -- in percentage
 get_cpu_load :: FluidSynth Double
 get_synth_error :: FluidSynth String
+
+----- Synthesizer plugin -----
 
 -- all of them only on synth thread
 write_s16 :: [Word16] -> Int -> Int -> [Word16] -> Int -> Int -> FluidSynth Bool
 write_float :: [Float] -> Int -> Int -> [Float] -> Int -> Int -> FluidSynth Bool
 nwrite_float :: [(Float, Float)] -> FluidSynth Bool
 process :: AudioCallback
+
+----- Synthesizer's interface to handle SoundFont loaders -----
 
 add_sfloader :: SoundFontLoader -> FluidSynth ()
 -- next 3 only on synth thread
