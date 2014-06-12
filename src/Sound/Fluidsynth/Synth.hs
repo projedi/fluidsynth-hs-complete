@@ -328,6 +328,7 @@ defaultInterpolationMethod = undefined
 highestInterpolationMethod :: InterpolationMethod
 highestInterpolationMethod = undefined
 
+-- TODO: This must be completely moved to Gen module
 {-
 ----- Generator interface -----
 
@@ -339,7 +340,9 @@ type GenValue = Float
 set_gen :: Event.Channel -> GenType -> GenValue -> FluidSynth Bool
 set_gen2 :: Event.Channel -> GenType -> GenValue -> Bool -> Bool -> FluidSynth Bool
 get_gen :: Event.Channel -> GenType -> FluidSynth GenValue
+-}
 
+{-
 ----- Tuning -----
 
 -- 0 - 127
