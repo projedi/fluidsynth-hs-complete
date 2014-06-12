@@ -58,6 +58,10 @@ module Sound.Fluidsynth.Synth
    , setChorusOn
    , setChorusParams
    -- * Audio and MIDI channels
+   , audioChannelCount
+   , audioGroupCount
+   , effectChannelCount
+   , midiChannelCount
    -- * Synthesis parameters
    -- * Generator interface
    -- * Tuning
@@ -248,16 +252,23 @@ setChorusOn = undefined
 defaultChorusParams :: ChorusParams
 defaultChorusParams = undefined
 
-{-
 ----- Audio and MIDI channels -----
 
-count_midi_channels :: FluidSynth Int
--- original: 1 = 2, 2 = 4; return a (*2)
-count_audio_channels :: FluidSynth Int
--- original: 1 = 2, 2 = 4; return a (*2)
-count_audio_groups :: FluidSynth Int
-count_effect_channels :: FluidSynth Int
+midiChannelCount :: FluidSynth Int
+midiChannelCount = undefined
 
+-- | Original returns value 2 times less
+audioChannelCount :: FluidSynth Int
+audioChannelCount = undefined
+
+-- | Original returns value 2 times less
+audioGroupCount :: FluidSynth Int
+audioGroupCount = undefined
+
+effectChannelCount :: FluidSynth Int
+effectChannelCount = undefined
+
+{-
 ----- Synthesis parameters -----
 
 type SampleRate = Float
