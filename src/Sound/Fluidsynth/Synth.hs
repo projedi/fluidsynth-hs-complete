@@ -230,6 +230,7 @@ data ReverbParams = ReverbParams
 
 makeLenses ''ReverbParams
 
+-- | Not realtime-safe, should not be called on synth thread
 setReverbParams :: ReverbParams -> FluidSynth ()
 setReverbParams = undefined
 
@@ -314,6 +315,7 @@ setPolyphony = undefined
 getPolyphony :: FluidSynth Polyphony
 getPolyphony = undefined
 
+-- | For accuracy should be called synchronously with the audio synthesis process (e.g. in audio callback)
 getActiveVoiceCount :: FluidSynth Int
 getActiveVoiceCount = undefined
 
