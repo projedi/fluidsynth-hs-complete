@@ -1,7 +1,11 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TemplateHaskell #-}
 module Sound.Fluidsynth.Synth
-   ( -- * MIDI channel messages
-     ChannelInfo(..)
+   (
+   -- * SynthThread
+     SynthThread()
+   , onSynthThread
+   -- * MIDI channel messages
+   , ChannelInfo(..)
    , channelInfoSoundFontID
    , channelInfoBankNumber
    , channelInfoProgramNumber
@@ -85,12 +89,24 @@ module Sound.Fluidsynth.Synth
    -- * Synthesizer's interface to handle SoundFont loaders
    ) where
 
+import Control.Applicative
 import Control.Lens
+
+import Control.Monad.Trans(MonadIO)
 
 import Sound.Fluidsynth.Internal.FFI.Synth
 import Sound.Fluidsynth.Internal.FFI.Types
 import Sound.Fluidsynth.Internal.Types
 import qualified Sound.Fluidsynth.Internal.Event as Event
+
+----- SyncThread -----
+
+-- | For fluidsynth functions that __must__ be executed on synthesis thread
+newtype SynthThread a = SynthThread (FluidSynth a)
+   deriving (Functor, Applicative, Monad, MonadIO)
+
+onSynthThread :: FluidSynth a -> SynthThread a
+onSynthThread = SynthThread
 
 ----- MIDI Channel messages -----
 
@@ -166,7 +182,7 @@ start :: VoiceGroupID
       -> Event.Channel
       -> Event.Key
       -> Event.Velocity
-      -> FluidSynth Bool
+      -> SynthThread Bool
 start = undefined
 
 stop :: VoiceGroupID -> FluidSynth Bool
