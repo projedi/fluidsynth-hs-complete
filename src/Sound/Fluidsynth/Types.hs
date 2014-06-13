@@ -3,6 +3,8 @@ module Sound.Fluidsynth.Types
    , Settings
    , FluidSynth
    , MidiPlayer
+   , SynthThread
+   , onSynthThread
    , withSettingsRunFluid
    ) where
 

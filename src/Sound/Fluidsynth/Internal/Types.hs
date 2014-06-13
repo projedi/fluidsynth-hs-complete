@@ -11,6 +11,8 @@ module Sound.Fluidsynth.Internal.Types
    , ReleaseResources(..)
    , Settings
    , Synth(..)
+   , SynthThread(..)
+   , onSynthThread
    , withSettingsRunFluid
    -- Lenses from FluidState
    , audioDriver
@@ -160,6 +162,13 @@ instance MonadSettings ReaderFluidState where
 -- | The main monad in which everything happens.
 newtype FluidSynth a = FluidSynth (ReaderFluidState a)
    deriving (Functor, Applicative, Monad, MonadIO, MonadSettings)
+
+-- | For fluidsynth functions that __must__ be executed on synthesis thread
+newtype SynthThread a = SynthThread (FluidSynth a)
+   deriving (Functor, Applicative, Monad, MonadIO, MonadSettings)
+
+onSynthThread :: FluidSynth a -> SynthThread a
+onSynthThread = SynthThread
 
 -- | Run the 'Settings' monad and then allocate a synthesizer and
 --   run 'FluidSynth' monad. Releases all the resources at the end.
