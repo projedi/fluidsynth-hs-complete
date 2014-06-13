@@ -1,4 +1,5 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TemplateHaskell #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures #-}
+{-# LANGUAGE TemplateHaskell, TypeFamilies, TypeOperators #-}
 module Sound.Fluidsynth.Synth
    (
    -- * MIDI channel messages
@@ -80,12 +81,39 @@ module Sound.Fluidsynth.Synth
    , setPolyphony
    , setSampleRate
    -- * Tuning
+   , ActualVector
+   , iterateVector
+   , vectorAt
+   , vectorToList
+   , Cent
+   , CentArrayOctave
+   , CentArrayPitch
+   , KeyCentArray
+   , TuningBank
+   , TuningPreset
+   , createKeyTuning
+   , activateKeyTuning
+   , createOctaveTuning
+   , activateOctaveTuning
+   , tuneNotes
+   , selectTuning
+   , activateTuning
+   , resetTuning
+   , deactivateTuning
+   , tuningIterationStart
+   , tuningIterationNext
+   , tuningDump
    -- * Misc
    -- * Synthesizer plugin
    -- * Synthesizer's interface to handle SoundFont loaders
    ) where
 
 import Control.Lens
+
+import Data.IntMap(IntMap)
+import qualified Data.IntMap as IntMap
+import Data.Proxy(Proxy(..))
+import GHC.TypeLits
 
 import Sound.Fluidsynth.Internal.FFI.Synth
 import Sound.Fluidsynth.Internal.FFI.Types
@@ -330,34 +358,78 @@ defaultInterpolationMethod = undefined
 highestInterpolationMethod :: InterpolationMethod
 highestInterpolationMethod = undefined
 
-{-
 ----- Tuning -----
+
+newtype ActualVector (n :: Nat) a = ActualVector [a]
+   deriving Functor
+
+iterateVector :: KnownNat n => (a -> a) -> a -> ActualVector n a
+iterateVector f x = go f x Proxy
+ where go :: KnownNat n => (a -> a) -> a -> Proxy n -> ActualVector n a
+       go f x proxy = ActualVector $ take (fromInteger $ natVal proxy) $ iterate f x
+
+vectorAt :: (KnownNat m, m <= (n + 1)) => ActualVector n a -> Proxy m -> a
+vectorAt (ActualVector lst) proxy = lst !! (fromInteger $ natVal proxy)
+
+vectorToList :: ActualVector n a -> [a]
+vectorToList (ActualVector lst) = lst
 
 -- 0 - 127
 type TuningBank = Int
+
 -- 0 - 127
 type TuningPreset = Int
+
 type Cent = Float
--- length of 128; normally 0 = 0, 1 = 100, 60 = 6000
-type CentArrayPitch = [Cent]
--- length of 12; starting from C
-type CentArrayOctave = [Cent]
-type KeyCentArray = [(Event.Key, Cent)]
+
+-- normally [0] = 0, [1] = 100, ..., [60] = 6000, ...
+type CentArrayPitch = ActualVector 128 Cent
+
+-- starting from C
+type CentArrayOctave = ActualVector 12 Cent
+
+-- | From 'Event.Key' to 'Cent'
+type KeyCentArray = IntMap Cent
 
 -- empty CentArray(NULL) is for a well-tempered scale
-create_key_tuning :: TuningBank -> TuningPreset -> String -> CentArrayPitch -> FluidSynth Bool
-activate_key_tuning :: TuningBank -> TuningPreset -> String -> CentArrayPitch -> Bool -> FluidSynth Bool
-create_octave_tuning :: TuningBank -> TuningPreset -> String -> CentArrayOctave -> FluidSynth Bool
-activate_octave_tuning :: TuningBank -> TuningPreset -> String -> CentArrayOctave -> Bool -> FluidSynth Bool
-tune_notes :: TuningBank -> TuningPreset -> KeyCentArray -> Bool -> FluidSynth Bool
-select_tuning :: Event.Channel -> TuningBank -> TuningPreset -> FluidSynth Bool
-activate_tuning :: Event.Channel -> TuningBank -> TuningPreset -> Bool -> FluidSynth Bool
-reset_tuning :: Event.Channel -> FluidSynth Bool
-deactivate_tuning :: Event.Channel -> Bool -> FluidSynth Bool
-tuning_iteration_start :: FluidSynth ()
-tuning_iteration_next :: FluidSynth (Maybe (TuningBank, TuningPreset))
-tuning_dump :: TuningBank -> TuningPreset -> FluidSynth (Maybe (String, CentArrayPitch))
+createKeyTuning :: TuningBank -> TuningPreset -> String -> CentArrayPitch -> FluidSynth Bool
+createKeyTuning = undefined
 
+activateKeyTuning :: TuningBank -> TuningPreset -> String -> CentArrayPitch -> Bool -> FluidSynth Bool
+activateKeyTuning = undefined
+
+createOctaveTuning :: TuningBank -> TuningPreset -> String -> CentArrayOctave -> FluidSynth Bool
+createOctaveTuning = undefined
+
+activateOctaveTuning :: TuningBank -> TuningPreset -> String -> CentArrayOctave -> Bool -> FluidSynth Bool
+activateOctaveTuning = undefined
+
+tuneNotes :: TuningBank -> TuningPreset -> KeyCentArray -> Bool ->FluidSynth Bool
+tuneNotes = undefined
+
+selectTuning :: Event.Channel -> TuningBank -> TuningPreset -> FluidSynth Bool
+selectTuning = undefined
+
+activateTuning :: Event.Channel -> TuningBank -> TuningPreset -> Bool -> FluidSynth Bool
+activateTuning = undefined
+
+resetTuning :: Event.Channel -> FluidSynth Bool
+resetTuning = undefined
+
+deactivateTuning :: Event.Channel -> Bool -> FluidSynth Bool
+deactivateTuning = undefined
+
+-- TODO: What are we iterating on exactly?
+tuningIterationStart :: FluidSynth()
+tuningIterationStart = undefined
+
+tuningIterationNext :: FluidSynth (Maybe (TuningBank, TuningPreset))
+tuningIterationNext = undefined
+
+tuningDump :: TuningBank -> TuningPreset -> FluidSynth (Maybe (String, CentArrayPitch))
+tuningDump = undefined
+
+{-
 ----- Misc -----
 
 -- in percentage
