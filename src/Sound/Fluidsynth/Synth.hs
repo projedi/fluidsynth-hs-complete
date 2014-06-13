@@ -79,7 +79,6 @@ module Sound.Fluidsynth.Synth
    , setInterpolationMethod
    , setPolyphony
    , setSampleRate
-   -- * Generator interface
    -- * Tuning
    -- * Misc
    -- * Synthesizer plugin
@@ -330,20 +329,6 @@ defaultInterpolationMethod = undefined
 
 highestInterpolationMethod :: InterpolationMethod
 highestInterpolationMethod = undefined
-
--- TODO: This must be completely moved to Gen module
-{-
------ Generator interface -----
-
--- These two should be in Gen module and the first one is enum
-type GenType = Int
-type GenValue = Float
-
-
-set_gen :: Event.Channel -> GenType -> GenValue -> FluidSynth Bool
-set_gen2 :: Event.Channel -> GenType -> GenValue -> Bool -> Bool -> FluidSynth Bool
-get_gen :: Event.Channel -> GenType -> FluidSynth GenValue
--}
 
 {-
 ----- Tuning -----

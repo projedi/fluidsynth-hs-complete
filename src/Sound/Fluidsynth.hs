@@ -2,6 +2,7 @@
 module Sound.Fluidsynth
    ( module Sound.Fluidsynth.Audio
    , module Sound.Fluidsynth.Event
+   , module Sound.Fluidsynth.Gen
    , module Sound.Fluidsynth.Log
    , module Sound.Fluidsynth.Midi
    , module Sound.Fluidsynth.Misc
@@ -12,6 +13,7 @@ module Sound.Fluidsynth
 
 import Sound.Fluidsynth.Audio
 import Sound.Fluidsynth.Event
+import Sound.Fluidsynth.Gen
 import Sound.Fluidsynth.Log
 import Sound.Fluidsynth.Midi
 import Sound.Fluidsynth.Misc
