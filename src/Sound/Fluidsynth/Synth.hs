@@ -91,14 +91,10 @@ module Sound.Fluidsynth.Synth
    , KeyCentArray
    , TuningBank
    , TuningPreset
-   , createKeyTuning
    , activateKeyTuning
-   , createOctaveTuning
    , activateOctaveTuning
    , tuneNotes
-   , selectTuning
    , activateTuning
-   , resetTuning
    , deactivateTuning
    , tuningIterationStart
    , tuningIterationNext
@@ -392,34 +388,42 @@ type CentArrayOctave = ActualVector 12 Cent
 type KeyCentArray = IntMap Cent
 
 -- empty CentArray(NULL) is for a well-tempered scale
-createKeyTuning :: TuningBank -> TuningPreset -> String -> CentArrayPitch -> FluidSynth Bool
-createKeyTuning = undefined
-
-activateKeyTuning :: TuningBank -> TuningPreset -> String -> CentArrayPitch -> Bool -> FluidSynth Bool
+activateKeyTuning :: TuningBank
+                  -> TuningPreset
+                  -> String -- ^ name
+                  -> CentArrayPitch
+                  -> Bool -- ^ apply in realtime to existing notes TODO: explain
+                  -> FluidSynth Bool
 activateKeyTuning = undefined
 
-createOctaveTuning :: TuningBank -> TuningPreset -> String -> CentArrayOctave -> FluidSynth Bool
-createOctaveTuning = undefined
-
-activateOctaveTuning :: TuningBank -> TuningPreset -> String -> CentArrayOctave -> Bool -> FluidSynth Bool
+activateOctaveTuning :: TuningBank
+                     -> TuningPreset
+                     -> String -- ^ name
+                     -> CentArrayOctave
+                     -> Bool -- ^ apply in realtime to existing notes TODO: explain
+                     -> FluidSynth Bool
 activateOctaveTuning = undefined
 
-tuneNotes :: TuningBank -> TuningPreset -> KeyCentArray -> Bool ->FluidSynth Bool
+tuneNotes :: TuningBank
+          -> TuningPreset
+          -> KeyCentArray
+          -> Bool -- ^ apply in realtime to existing notes TODO: explain
+          -> FluidSynth Bool
 tuneNotes = undefined
 
-selectTuning :: Event.Channel -> TuningBank -> TuningPreset -> FluidSynth Bool
-selectTuning = undefined
-
-activateTuning :: Event.Channel -> TuningBank -> TuningPreset -> Bool -> FluidSynth Bool
+activateTuning :: Event.Channel
+               -> TuningBank
+               -> TuningPreset
+               -> Bool -- ^ apply in realtime to existing notes TODO: explain
+               -> FluidSynth Bool
 activateTuning = undefined
 
-resetTuning :: Event.Channel -> FluidSynth Bool
-resetTuning = undefined
-
-deactivateTuning :: Event.Channel -> Bool -> FluidSynth Bool
+deactivateTuning :: Event.Channel
+                 -> Bool -- ^ apply in realtime to existing notes TODO: explain
+                 -> FluidSynth Bool
 deactivateTuning = undefined
 
--- TODO: What are we iterating on exactly?
+-- TODO: What is the effect of this iteration on the synth?
 tuningIterationStart :: FluidSynth()
 tuningIterationStart = undefined
 
