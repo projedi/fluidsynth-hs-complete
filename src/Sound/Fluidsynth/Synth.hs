@@ -100,6 +100,8 @@ module Sound.Fluidsynth.Synth
    , tuningIterationNext
    , tuningDump
    -- * Misc
+   , getCpuLoad
+   , lastErrorString
    -- * Synthesizer plugin
    -- * Synthesizer's interface to handle SoundFont loaders
    ) where
@@ -433,13 +435,17 @@ tuningIterationNext = undefined
 tuningDump :: TuningBank -> TuningPreset -> FluidSynth (Maybe (String, CentArrayPitch))
 tuningDump = undefined
 
-{-
 ----- Misc -----
 
--- in percentage
-get_cpu_load :: FluidSynth Double
-get_synth_error :: FluidSynth String
+-- | in percentage
+getCpuLoad :: FluidSynth Double
+getCpuLoad = undefined
 
+-- | Get the last string in internal error buffer (put there via fluid_log or fluid_debug)
+lastErrorString :: FluidSynth String
+lastErrorString = undefined
+
+{-
 ----- Synthesizer plugin -----
 
 -- all of them only on synth thread

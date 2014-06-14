@@ -182,7 +182,7 @@ import Sound.Fluidsynth.Internal.FFI.Types
 -- Misc
 
 #ccall fluid_synth_get_cpu_load , Ptr <fluid_synth_t> -> IO CDouble
-#ccall fluid_synth_get_synth_error , Ptr <fluid_synth_t> -> IO CString
+#ccall fluid_synth_synth_error , Ptr <fluid_synth_t> -> IO CString
 
 -- Synthesizer plugin
 
