@@ -50,7 +50,7 @@ type AudioCallback
    = Int -- ^ Length of audio in frames
    -> [[Float]] -- ^ Input (unused as of fluidsynth 1.1.6)
    -> Int -- ^ Output channel count
-   -> FluidSynth [[Float]] -- ^ Output buffers(outer list is of channels)
+   -> SynthThread [[Float]] -- ^ Output buffers(outer list is of channels)
 
 -- | Like 'replaceAudioDriver' but supply your own callback to generate sound samples.
 replaceAudioDriverWithCallback :: AudioCallback -> FluidSynth Bool

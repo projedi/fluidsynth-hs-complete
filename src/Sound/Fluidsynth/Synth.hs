@@ -103,6 +103,8 @@ module Sound.Fluidsynth.Synth
    , getCpuLoad
    , lastErrorString
    -- * Synthesizer plugin
+   , nWriteFloat
+   , process
    -- * Synthesizer's interface to handle SoundFont loaders
    ) where
 
@@ -113,6 +115,7 @@ import qualified Data.IntMap as IntMap
 import Data.Proxy(Proxy(..))
 import GHC.TypeLits
 
+import Sound.Fluidsynth.Audio(AudioCallback)
 import Sound.Fluidsynth.Internal.FFI.Synth
 import Sound.Fluidsynth.Internal.FFI.Types
 import Sound.Fluidsynth.Internal.Types
@@ -445,15 +448,18 @@ getCpuLoad = undefined
 lastErrorString :: FluidSynth String
 lastErrorString = undefined
 
-{-
 ----- Synthesizer plugin -----
 
--- all of them only on synth thread
-write_s16 :: [Word16] -> Int -> Int -> [Word16] -> Int -> Int -> FluidSynth Bool
-write_float :: [Float] -> Int -> Int -> [Float] -> Int -> Int -> FluidSynth Bool
-nwrite_float :: [(Float, Float)] -> FluidSynth Bool
-process :: AudioCallback
+-- TODO: Somehow implement write_s16, write_float; and their type, fluid_audio_callback_t
 
+nWriteFloat :: Int
+            -> SynthThread (Maybe ([Float], [Float])) -- ^ left, right
+nWriteFloat = undefined
+
+process :: AudioCallback
+process = undefined
+
+{-
 ----- Synthesizer's interface to handle SoundFont loaders -----
 
 add_sfloader :: SoundFontLoader -> FluidSynth ()
