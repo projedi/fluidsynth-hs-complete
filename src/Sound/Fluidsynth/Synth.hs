@@ -106,6 +106,15 @@ module Sound.Fluidsynth.Synth
    , nWriteFloat
    , process
    -- * Synthesizer's interface to handle SoundFont loaders
+   , SoundFontLoader
+   , Sample
+   , Voice
+   , VoiceID
+   , addSoundFontLoader
+   , allocVoice
+   , getVoiceList
+   , handleMidiEvent
+   , startVoice
    ) where
 
 import Control.Lens
@@ -116,6 +125,7 @@ import Data.Proxy(Proxy(..))
 import GHC.TypeLits
 
 import Sound.Fluidsynth.Audio(AudioCallback)
+import Sound.Fluidsynth.Midi(HandleMidiEvent)
 import Sound.Fluidsynth.Internal.FFI.Synth
 import Sound.Fluidsynth.Internal.FFI.Types
 import Sound.Fluidsynth.Internal.Types
@@ -459,15 +469,29 @@ nWriteFloat = undefined
 process :: AudioCallback
 process = undefined
 
-{-
 ----- Synthesizer's interface to handle SoundFont loaders -----
 
-add_sfloader :: SoundFontLoader -> FluidSynth ()
--- next 3 only on synth thread
-alloc_voice :: Sample -> Event.Channel -> Event.Key -> Event.Velocity -> FluidSynth (Maybe Voice)
-start_voice :: Voice -> FluidSynth ()
-get_voicelist :: VoiceID -> FluidSynth [Voice]
+-- TODO: Following two should be moved to SoundFont module
 
-handle_midi_event :: HandleMidiEvent
+newtype SoundFontLoader = SoundFontLoader C'fluid_sfloader_t
 
--}
+-- | Should be called before any SoundFont file is loaded
+addSoundFontLoader :: SoundFontLoader -> FluidSynth ()
+addSoundFontLoader = undefined
+
+newtype Sample = Sample C'fluid_sample_t
+newtype Voice = Voice C'fluid_voice_t
+
+allocVoice :: Sample -> Event.Channel -> Event.Key -> Event.Velocity -> SynthThread (Maybe Voice)
+allocVoice = undefined
+
+startVoice :: Voice -> SynthThread ()
+startVoice = undefined
+
+type VoiceID = Int
+
+getVoiceList :: Int -> VoiceID -> SynthThread [Voice]
+getVoiceList = undefined
+
+handleMidiEvent :: HandleMidiEvent
+handleMidiEvent = undefined
