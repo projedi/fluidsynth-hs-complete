@@ -8,6 +8,8 @@ module Sound.Fluidsynth.Gen
    , GeneratorType(..)
    , defaultGenerators
    , generatorCount
+   , getGenerator
+   , setGenerator
    ) where
 
 import Sound.Fluidsynth.Internal.FFI.Gen
@@ -98,11 +100,10 @@ generatorCount = fromIntegral c'GEN_LAST
 defaultGenerators :: FluidSynth (Map GeneratorType Generator)
 defaultGenerators = undefined
 
-{-
-type GenType = Int
-type GenValue = Float
+-- set_gen2 from synth.h
+setGenerator :: Event.Channel -> GeneratorType -> Float -> Bool -> Bool -> FluidSynth Bool
+setGenerator = undefined
 
-set_gen :: Event.Channel -> GenType -> GenValue -> FluidSynth Bool
-set_gen2 :: Event.Channel -> GenType -> GenValue -> Bool -> Bool -> FluidSynth Bool
-get_gen :: Event.Channel -> GenType -> FluidSynth GenValue
--}
+-- get_gen from synth.h
+getGenerator :: Event.Channel -> GeneratorType -> FluidSynth Float
+getGenerator = undefined
